@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "68e93063c254389742e0cf7cb18118fc",
+    "content-hash": "f827f366371b2396edd1e53f17c2cba8",
     "packages": [
         {
             "name": "psr/cache",
