@@ -159,12 +159,4 @@ class GameConfiguratorCommand extends Command
 
         $this->gameService->generateConfigurationFromArray($this->gameConfiguration);
     }
-
-//    private function integerMoreThanZero($varToTest)
-//    {
-//        if (ctype_digit($varToTest)) {
-//            return $varToTest;
-//        }
-//        return 0;
-//    }
 }
