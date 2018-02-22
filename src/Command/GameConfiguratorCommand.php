@@ -2,24 +2,29 @@
 
 namespace App\Command;
 
-use function Couchbase\defaultDecoder;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use App\Service\GameService;
 
 class GameConfiguratorCommand extends Command
 {
+    private $gameService;
+
+    public function __construct(GameService $gameService)
+    {
+        $this->gameService = $gameService;
+
+        parent::__construct();
+    }
+
     private $gameConfiguration = [
-        'width' => 0,
-        'height' => 0,
+        'map_dimension' => 0,
         'treasures' => [],
         'mountains' => [],
         'adventurers' => [],
     ];
-    private $mapWidth = 0;
-
-    private $mapHeight = 0;
 
     /** @var InputInterface */
     private $input;
@@ -31,59 +36,58 @@ class GameConfiguratorCommand extends Command
 
     private $finished = false;
 
-    protected function configure()
+    private function askQuestion($message)
     {
-        $this
-            ->setName('treasurebox:configurator')
-            ->setDescription('Provide data to create automatically a game configuration');
+        $question = new Question($message . ' : ');
+        return $this->helperQuestion->ask($this->input, $this->output, $question);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    private function askXY($separator, $isPosition = true)
     {
-        $this->helperQuestion = $this->getHelper('question');
-        $this->input = $input;
-        $this->output = $output;
+        // defaulting to width / height
+        $horizontal = 'Provide map width';
+        $vertical = 'Provide map height';
 
-        $this->gameConfiguration['width'] = $this->askMapDimension('width');
-        $this->gameConfiguration['height'] = $this->askMapDimension('height');
-
-        while (!$this->finished) {
-            $this->askOption();
+        if ($isPosition) {
+            $vertical = 'Provide y position (vertical)';
+            $horizontal = 'Provide x position (horizontal)';
         }
 
-        $this->output->writeln('/*****************************');
-        $this->output->writeln('/************ RECAP **********');
-        $this->output->writeln('/*****************************');
+        $positionX = $this->askQuestion($horizontal);
+        $positionY = $this->askQuestion($vertical);
 
-        $this->displayRecap();
+        return $positionX . $separator . $positionY;
     }
 
-    private function askMapDimension($type, $displayError = false)
+    private function askOption()
     {
-        if ($displayError) {
-            $this->output->writeln('Please provide an integer value.. That integer must be higher than 0');
+        $input = $this->askQuestion('What would you like to add in this map ? (T: treasure, M: mountain, A: adventurer, F: Stop the script and generate configuration)');
+        $this->output->writeln('chosen : ' . $input);
+
+
+        switch ($input) {
+            case 'T':
+                $this->gameConfiguration['treasures'][] = $this->askXY(',');
+                break;
+            case 'M':
+                $this->gameConfiguration['mountains'][] = $this->askXY(',');
+                break;
+            case 'A':
+                $this->gameConfiguration['adventurers'][] = [
+                    'name' => $this->askQuestion('Name'),
+                    'direction' => $this->askQuestion('Direction (N : North / S : South / E : East / W: West'),
+                    'position' => $this->askXY(','),
+                ];
+                break;
+            case 'F':
+                if ($this->canBeFinished()) {
+                    $this->finished = true;
+                }
+                break;
+            default:
+                $this->output->writeln('Option can only be : T / M / A / F');
+                break;
         }
-
-        $question = new Question('Provide a map ' . $type . ' > 0 (int) : ');
-        $dimension = $this->integerMoreThanZero($this->helperQuestion->ask($this->input, $this->output, $question));
-
-        if ($dimension > 0) {
-            return $dimension;
-        }
-        return $this->askMapDimension($type, true);
-    }
-
-    private function integerMoreThanZero($varToTest)
-    {
-        if (ctype_digit($varToTest)) {
-            return $varToTest;
-        }
-        return 0;
-    }
-
-    private function displayRecap()
-    {
-        $this->output->writeln('Map dimension (width*height) : ' . $this->mapWidth . '*' . $this->mapHeight);
     }
 
     private function canBeFinished()
@@ -101,31 +105,66 @@ class GameConfiguratorCommand extends Command
         return false;
     }
 
-    private function askOption()
+    private function displayRecap()
     {
-        $question = new Question('What would you like to add in this map ? (T: treasure, M: mountain, A: adventurer, F: Stop the script and generate configuration)');
-        $option = $this->helperQuestion->ask($this->input, $this->output, $question);
-
-        $this->output->writeln('chosen : ' . $option);
-
-        switch ($option) {
-            case 'T':
-                $this->output->writeln('add new treasure');
-                break;
-            case 'M':
-                $this->output->writeln('add new mountain');
-                break;
-            case 'A':
-                $this->output->writeln('add new adventurer');
-                break;
-            case 'F':
-                if ($this->canBeFinished()) {
-                    $this->finished = true;
-                }
-                break;
-            default:
-                $this->output->writeln('Option can only be : T / M / A / F');
-                break;
+        $this->output->writeln('Map dimension (width*height) : ' . $this->gameConfiguration['map_dimension']);
+        foreach ($this->gameConfiguration['adventurers'] as $index => $adventurerData) {
+            $this->output->writeln('Adventurer #' . ($index+1) . ' -----------');
+            $this->output->writeln('Name : ' . $adventurerData['name']);
+            $this->output->writeln('Direction : ' . $adventurerData['direction']);
         }
+        $this->output->writeln('Mountains -----------');
+        array_walk($this->gameConfiguration['mountains'], function ($mountainPosition) {
+            $this->output->writeln($mountainPosition);
+        });
+        $this->output->writeln('Treasures -----------');
+        array_walk($this->gameConfiguration['treasures'], function ($treasurePosition) {
+            $this->output->writeln($treasurePosition);
+        });
     }
+
+    protected function configure()
+    {
+        $this
+            ->setName('treasurebox:configurator')
+            ->setDescription('Provide data to create automatically a game configuration');
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->helperQuestion = $this->getHelper('question');
+        $this->input = $input;
+        $this->output = $output;
+
+        /*$this->gameConfiguration['map_dimension'] = $this->askXY('*', false);
+
+        while (!$this->finished) {
+            $this->askOption();
+        }
+
+        $this->output->writeln('/*****************************');
+        $this->output->writeln('/********** Summary **********');
+        $this->output->writeln('/*****************************');
+
+        $this->displayRecap();*/
+
+        $this->gameConfiguration['map_dimension'] = '10*10';
+        $this->gameConfiguration['mountains'][] = '1,1';
+        $this->gameConfiguration['treasures'][] = '2,2';
+        $this->gameConfiguration['adventurers'][] = [
+            'name' => 'Nicolas',
+            'position' => '4,4',
+            'direction' => 'N',
+        ];
+
+        $this->gameService->generateConfigurationFromArray($this->gameConfiguration);
+    }
+
+//    private function integerMoreThanZero($varToTest)
+//    {
+//        if (ctype_digit($varToTest)) {
+//            return $varToTest;
+//        }
+//        return 0;
+//    }
 }
