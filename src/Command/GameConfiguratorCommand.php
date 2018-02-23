@@ -148,12 +148,12 @@ class GameConfiguratorCommand extends Command
 
         $this->displayRecap();*/
 
-        $this->gameConfiguration['map_dimension'] = '10*10';
+        $this->gameConfiguration['map_dimension'] = '100*10';
         $this->gameConfiguration['mountains'][] = '1,1';
-        $this->gameConfiguration['treasures'][] = '2,2';
+        $this->gameConfiguration['treasures'][] = '1,2';
         $this->gameConfiguration['adventurers'][] = [
             'name' => 'Nicolas',
-            'position' => '4,4',
+            'position' => '1,4',
             'direction' => 'N',
         ];
 
