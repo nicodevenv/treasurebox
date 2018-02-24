@@ -231,22 +231,24 @@ class GameService {
                     $maxLoop = strlen($actions);
                 }
 
-                switch ($actions[$looping]) {
-                    case Entities\AdventurerOption::MOVE_ACTION:
-                        if ($this->map->isAdventurerMovable($adventurer)) {
-                            $this->map->moveAdventurer($adventurer);
-                            if ($displayOnMove) {
-                                echo $this->map->displayMap($longestCharCount);
-                                echo $separator;
+                if (isset($actions[$looping])) {
+                    switch ($actions[$looping]) {
+                        case Entities\AdventurerOption::MOVE_ACTION:
+                            if ($this->map->isAdventurerMovable($adventurer)) {
+                                $this->map->moveAdventurer($adventurer);
+                                if ($displayOnMove) {
+                                    echo $this->map->displayMap($longestCharCount);
+                                    echo $separator;
+                                }
                             }
-                        }
-                        break;
-                    case Entities\AdventurerOption::RIGHT_ACTION;
-                        $adventurer->turn(Entities\AdventurerOption::RIGHT_ACTION);
-                        break;
-                    case Entities\AdventurerOption::LEFT_ACTION:
-                        $adventurer->turn(Entities\AdventurerOption::LEFT_ACTION);
-                        break;
+                            break;
+                        case Entities\AdventurerOption::RIGHT_ACTION;
+                            $adventurer->turn(Entities\AdventurerOption::RIGHT_ACTION);
+                            break;
+                        case Entities\AdventurerOption::LEFT_ACTION:
+                            $adventurer->turn(Entities\AdventurerOption::LEFT_ACTION);
+                            break;
+                    }
                 }
             }
             $looping++;
