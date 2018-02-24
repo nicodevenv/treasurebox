@@ -9,9 +9,8 @@ class GameService {
     const MOUNTAIN_REFERENCE = 'M';
     const ADVENTURER_REFERENCE = 'A';
 
-    private $gameConfigurationPath = 'public/inputs/game_configuration.txt';
-
-    private $gameOutputPath = 'public/output/game_output.txt';
+    const CONFIGURATION_PATH = 'public/inputs/game_configuration.txt';
+    const OUTPUT_PATH = 'public/output/game_output.txt';
 
     private $sortedAdventurers = [];
 
@@ -22,9 +21,7 @@ class GameService {
 
     public function generateConfigurationFromArray($data)
     {
-        $filePath = $this->gameConfigurationPath;
-
-        $file = fopen($filePath, 'w');
+        $file = fopen(self::CONFIGURATION_PATH, 'w');
 
         foreach ($data as $row) {
             fwrite($file, $row . "\n");
@@ -38,11 +35,11 @@ class GameService {
      */
     private function getFile($filePath)
     {
-        if (!file_exists($this->gameConfigurationPath)) {
+        if (!file_exists(self::CONFIGURATION_PATH)) {
             throw new \Exception('The current file does not exist : ' . $filePath);
         }
 
-        $file = fopen($this->gameConfigurationPath, 'r');
+        $file = fopen(self::CONFIGURATION_PATH, 'r');
 
         if (!$file) {
             throw new \Exception('Unable to open file : ' . $filePath);
@@ -62,6 +59,8 @@ class GameService {
         if (count($dataArray) > $count) {
             throw new \Exception('The current data are not valid : ' . implode(' - ', $dataArray));
         }
+
+        return '';
     }
 
     /**
@@ -69,7 +68,7 @@ class GameService {
      */
     private function sortGameConfigurationData()
     {
-        $file = $this->getFile($this->gameConfigurationPath);
+        $file = $this->getFile(self::CONFIGURATION_PATH);
 
         $mapDimension = [];
         $mountains = [];
@@ -122,6 +121,15 @@ class GameService {
                             'actions' => $contentArray[5],
                         ];
                         break;
+                    default:
+                        throw new \Exception(
+                            sprintf(
+                                'Type format not allowed. "%s" given. ' .
+                                'Warning ! We\'ve detected some problem with copy paste data.. We\'ll fix it ASAP',
+                                $type
+                            )
+                        );
+                        break;
                 }
             }
         }
@@ -165,7 +173,7 @@ class GameService {
 
         switch($type) {
             case self::MAP_REFERENCE:
-                $this->map = new Entities\Map($data['width'], $data['height'], $this->gameOutputPath);
+                $this->map = new Entities\Map($data['width'], $data['height'], self::OUTPUT_PATH);
                 break;
             case self::MOUNTAIN_REFERENCE:
                 $option = new Entities\MountainOption($data, $this->map);
@@ -190,6 +198,11 @@ class GameService {
         if ($option !== null) {
             $this->map->addOption($option);
         }
+    }
+
+    public function getMap()
+    {
+        return $this->map;
     }
 
     public function playGameConfiguration()

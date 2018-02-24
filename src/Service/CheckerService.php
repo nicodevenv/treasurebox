@@ -16,30 +16,27 @@ class CheckerService {
         'G',
     ];
 
-    public static function isIntegerAndMoreThanZero($allowZero, $varToTest, $max = null)
+    public static function isIntegerAndMoreThanZero($allowZero, $varToTest, $max = null, $debug = false)
     {
-        if (ctype_digit($varToTest)) {
-            if ($varToTest < 0) {
-                return false;
-            }
+        $varToTest = intval($varToTest);
 
-            if (!$allowZero && $varToTest > 0) {
-                return true;
-            }
-
-            if ($max !== null && $varToTest > $max) {
-                return false;
-            }
-
-            return true;
+        if ($varToTest < 0) {
+            return false;
         }
 
-        return false;
+        if (!$allowZero && $varToTest == 0) {
+            return false;
+        }
+
+        if ($max !== null && $varToTest > $max) {
+            return false;
+        }
+
+        return true;
     }
 
     public static function isValidAdventurerDirection($direction)
     {
-
         if (!in_array($direction, self::$allowedDirections)) {
             return false;
         }

@@ -10,7 +10,8 @@
         "symfony/flex": "^1.0",
         "symfony/framework-bundle": "^4.0",
         "symfony/lts": "^4@dev",
-        "symfony/yaml": "^4.0"
+        "symfony/yaml": "^4.0",
+        "phpunit/phpunit": "^6.5"
     },
     "config": {
         "preferred-install": {
@@ -48,5 +49,8 @@
             "id": "01C6X4FDVGQ1KFFPQNNY1FE9PR",
             "allow-contrib": false
         }
+    },
+    "require-dev": {
+
     }
 }

@@ -84,4 +84,9 @@ class Map {
     {
         return $this->mapHeight;
     }
+
+    public function getMapFrames()
+    {
+        return $this->mapFrames;
+    }
 }
