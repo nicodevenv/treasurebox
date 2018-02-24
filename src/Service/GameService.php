@@ -4,17 +4,17 @@ namespace App\Service;
 use App\Entities;
 
 class GameService {
-    const MAP_REFERENCE = 'C';
-    const TREASURE_REFERENCE = 'T';
-    const MOUNTAIN_REFERENCE = 'M';
-    const ADVENTURER_REFERENCE = 'A';
-
     const CONFIGURATION_PATH = 'public/inputs/game_configuration.txt';
     const OUTPUT_PATH = 'public/output/game_output.txt';
 
-    private $sortedAdventurers = [];
+    private $allAdventurers = [];
+    private $allTreasures = [];
 
-    private $optionTypes = [self::MOUNTAIN_REFERENCE, self::TREASURE_REFERENCE, self::ADVENTURER_REFERENCE];
+    private $optionTypes = [
+        Entities\MountainOption::REFERENCE,
+        Entities\TreasureOption::REFERENCE,
+        Entities\AdventurerOption::REFERENCE
+    ];
 
     /** @var Entities\Map */
     private $map;
@@ -51,7 +51,7 @@ class GameService {
     /**
      * @param $dataArray
      * @param $count
-     *
+     * @return string
      * @throws \Exception
      */
     private function checkExactDataNumber($dataArray, $count)
@@ -83,7 +83,7 @@ class GameService {
                 $type = $contentArray[0];
 
                 switch($type) {
-                    case self::MAP_REFERENCE:
+                    case Entities\Map::REFERENCE:
                         if (!empty($mapDimension)) {
                             throw new \Exception('Map dimensions are defined multiple times');
                         }
@@ -94,7 +94,7 @@ class GameService {
                             'height' => $contentArray[2],
                         ];
                         break;
-                    case self::MOUNTAIN_REFERENCE:
+                    case Entities\MountainOption::REFERENCE:
                         $this->checkExactDataNumber($contentArray, 3);
 
                         $mountains[] = [
@@ -102,7 +102,7 @@ class GameService {
                             'y' => $contentArray[2],
                         ];
                         break;
-                    case self::TREASURE_REFERENCE:
+                    case Entities\TreasureOption::REFERENCE:
                         $this->checkExactDataNumber($contentArray, 4);
 
                         $treasures[] = [
@@ -111,7 +111,7 @@ class GameService {
                             'counter' => $contentArray[3],
                         ];
                         break;
-                    case self::ADVENTURER_REFERENCE:
+                    case Entities\AdventurerOption::REFERENCE:
                         $this->checkExactDataNumber($contentArray, 6);
                         $adventurers[] = [
                             'name' => $contentArray[1],
@@ -135,10 +135,10 @@ class GameService {
         }
 
         return [
-            self::MAP_REFERENCE => $mapDimension,
-            self::MOUNTAIN_REFERENCE => $mountains,
-            self::TREASURE_REFERENCE => $treasures,
-            self::ADVENTURER_REFERENCE => $adventurers,
+            Entities\Map::REFERENCE => $mapDimension,
+            Entities\MountainOption::REFERENCE => $mountains,
+            Entities\TreasureOption::REFERENCE => $treasures,
+            Entities\AdventurerOption::REFERENCE => $adventurers,
         ];
     }
 
@@ -172,18 +172,19 @@ class GameService {
         $option = null;
 
         switch($type) {
-            case self::MAP_REFERENCE:
+            case Entities\Map::REFERENCE:
                 $this->map = new Entities\Map($data['width'], $data['height'], self::OUTPUT_PATH);
                 break;
-            case self::MOUNTAIN_REFERENCE:
+            case Entities\MountainOption::REFERENCE:
                 $option = new Entities\MountainOption($data, $this->map);
                 break;
-            case self::TREASURE_REFERENCE:
+            case Entities\TreasureOption::REFERENCE:
                 $option = new Entities\TreasureOption($data, $this->map);
+                $this->allTreasures[] = $option;
                 break;
-            case self::ADVENTURER_REFERENCE:
+            case Entities\AdventurerOption::REFERENCE:
                 $option = new Entities\AdventurerOption($data, $this->map);
-                $this->sortedAdventurers[] = $option;
+                $this->allAdventurers[] = $option;
                 break;
             default:
                 throw new \Exception(
@@ -205,8 +206,40 @@ class GameService {
         return $this->map;
     }
 
-    public function playGameConfiguration()
+    /**
+     * @throws \Exception
+     */
+    public function playGameConfiguration($displayOnMove = false)
     {
-//        var_dump($configurationContent);
+        $longestCharCount = $this->map->getLongestCharCount(array_merge($this->allTreasures, $this->allAdventurers));
+        $separator = "------------------------------------\n";
+
+        echo $this->map->displayMap($longestCharCount);
+        echo $separator;
+
+        foreach( $this->allAdventurers as $adventurer) {
+            /** @var Entities\AdventurerOption $adventurer */
+            $actions = $adventurer->getActions();
+            for ($i = 0; $i < strlen($actions); $i++) {
+                switch ($actions[$i]) {
+                    case Entities\AdventurerOption::MOVE_ACTION:
+                        if ($this->map->isAdventurerMovable($adventurer)) {
+                            $this->map->moveAdventurer($adventurer);
+                            if ($displayOnMove) {
+                                echo $this->map->displayMap($longestCharCount);
+                                echo $separator;
+                            }
+                        }
+                        break;
+                    case Entities\AdventurerOption::RIGHT_ACTION;
+                        $adventurer->turn(Entities\AdventurerOption::RIGHT_ACTION);
+                        break;
+                    case Entities\AdventurerOption::LEFT_ACTION:
+                        $adventurer->turn(Entities\AdventurerOption::LEFT_ACTION);
+                        break;
+                }
+            }
+        }
+        echo $this->map->displayMap($longestCharCount);
     }
 }
