@@ -174,7 +174,7 @@ class Map {
         if (
             !CheckerService::isIntegerAndMoreThanZero(true, $nextPosition['x'], $this->getMaxX())
             || !CheckerService::isIntegerAndMoreThanZero(true, $nextPosition['y'], $this->getMaxY())
-            || $this->isMountainHere($nextPosition['x'], $nextPosition['y'])
+            || $this->isObstacleHere($nextPosition['x'], $nextPosition['y'])
         ) {
             return false;
         }
@@ -182,9 +182,9 @@ class Map {
         return true;
     }
 
-    public function isMountainHere($x, $y) {
+    public function isObstacleHere($x, $y) {
         foreach ($this->mapFrames[$y][$x] as $option) {
-            if ($option instanceof MountainOption) {
+            if ($option instanceof MountainOption || $option instanceof AdventurerOption) {
                 return true;
             }
         }
