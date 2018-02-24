@@ -53,6 +53,28 @@ class Map {
         }
     }
 
+    /**
+     * @param AbstractOption $option
+     * @param bool $isStackable
+     *
+     * @throws \Exception
+     */
+    public function addOption($option, $isStackable = false)
+    {
+        if (!$isStackable && count($this->mapFrames[$option->getY()][$option->getX()]) > 0) {
+            throw new \Exception(
+                sprintf(
+                    'Unable to add %s.. another option is already using [%s,%s] position',
+                    $option->getType(),
+                    $option->getX(),
+                    $option->getY()
+                )
+            );
+        }
+
+        $this->mapFrames[$option->getY()][$option->getX()][] = $option;
+    }
+
     public function getWidth()
     {
         return $this->mapWidth;

@@ -2,16 +2,22 @@
 namespace App\Service;
 
 use App\Entities;
-use App\Service\CheckerService;
-
 
 class GameService {
+    const MAP_REFERENCE = 'C';
+    const TREASURE_REFERENCE = 'T';
+    const MOUNTAIN_REFERENCE = 'M';
+    const ADVENTURER_REFERENCE = 'A';
+
     private $gameConfigurationPath = 'public/inputs/game_configuration.txt';
 
     private $gameOutputPath = 'public/output/game_output.txt';
 
     private $sortedAdventurers = [];
 
+    private $optionTypes = [self::MOUNTAIN_REFERENCE, self::TREASURE_REFERENCE, self::ADVENTURER_REFERENCE];
+
+    /** @var Entities\Map */
     private $map;
 
     public function generateConfigurationFromArray($data)
@@ -78,7 +84,7 @@ class GameService {
                 $type = $contentArray[0];
 
                 switch($type) {
-                    case 'C':
+                    case self::MAP_REFERENCE:
                         if (!empty($mapDimension)) {
                             throw new \Exception('Map dimensions are defined multiple times');
                         }
@@ -89,7 +95,7 @@ class GameService {
                             'height' => $contentArray[2],
                         ];
                         break;
-                    case 'M':
+                    case self::MOUNTAIN_REFERENCE:
                         $this->checkExactDataNumber($contentArray, 3);
 
                         $mountains[] = [
@@ -97,7 +103,7 @@ class GameService {
                             'y' => $contentArray[2],
                         ];
                         break;
-                    case 'T':
+                    case self::TREASURE_REFERENCE:
                         $this->checkExactDataNumber($contentArray, 4);
 
                         $treasures[] = [
@@ -106,7 +112,7 @@ class GameService {
                             'counter' => $contentArray[3],
                         ];
                         break;
-                    case 'A':
+                    case self::ADVENTURER_REFERENCE:
                         $this->checkExactDataNumber($contentArray, 6);
                         $adventurers[] = [
                             'name' => $contentArray[1],
@@ -121,10 +127,10 @@ class GameService {
         }
 
         return [
-            'C' => $mapDimension,
-            'M' => $mountains,
-            'T' => $treasures,
-            'A' => $adventurers,
+            self::MAP_REFERENCE => $mapDimension,
+            self::MOUNTAIN_REFERENCE => $mountains,
+            self::TREASURE_REFERENCE => $treasures,
+            self::ADVENTURER_REFERENCE => $adventurers,
         ];
     }
 
@@ -136,11 +142,15 @@ class GameService {
         $sortedData = $this->sortGameConfigurationData();
 
         foreach ($sortedData as $type => $data) {
+            if (in_array($type, $this->optionTypes)) {
+                foreach ($data as $row) {
+                    $this->createEntities($type, $row);
+                }
+                continue;
+            }
+
             $this->createEntities($type, $data);
         }
-
-        var_dump($sortedData);
-        exit();
     }
 
     /**
@@ -151,12 +161,34 @@ class GameService {
      */
     private function createEntities($type, $data)
     {
+        $option = null;
+
         switch($type) {
-            case 'C':
+            case self::MAP_REFERENCE:
                 $this->map = new Entities\Map($data['width'], $data['height'], $this->gameOutputPath);
                 break;
-            case 'M':
-                $mountain = new Entities\MountainOption($data, $this->map);
+            case self::MOUNTAIN_REFERENCE:
+                $option = new Entities\MountainOption($data, $this->map);
+                break;
+            case self::TREASURE_REFERENCE:
+                $option = new Entities\TreasureOption($data, $this->map);
+                break;
+            case self::ADVENTURER_REFERENCE:
+                $option = new Entities\AdventurerOption($data, $this->map);
+                $this->sortedAdventurers[] = $option;
+                break;
+            default:
+                throw new \Exception(
+                    sprintf(
+                        'Unable to create entity. (case not implemented : %s)',
+                        $type
+                    )
+                );
+                break;
+        }
+
+        if ($option !== null) {
+            $this->map->addOption($option);
         }
     }
 
@@ -164,89 +196,4 @@ class GameService {
     {
 //        var_dump($configurationContent);
     }
-//    private $map;
-//
-//    private $adventurers;
-//
-//    private $mountains;
-//
-//    private $treasures;
-//
-//    private $disabledPositions = [];
-//
-//    private $errors = [];
-//
-//    private function isValidXY($separator, $data, $type, $index = '', $maxXY = [])
-//    {
-//        $errorMessage = '';
-//        $xy = explode($separator, $data);
-//
-//        if (count($maxXY) === 0
-//            && (
-//                !$this->isIntegerAndMoreThanZero($xy[0])
-//                || !$this->isIntegerAndMoreThanZero($xy[1])
-//            )
-//        ) {
-//            $errorMessage = $type . $index . ' x / y must be integers and more than 0 !';
-//        }
-//
-//        if (count($maxXY) === 2
-//            && (
-//                !$this->isIntegerAndMoreThanZero($xy[0], $maxXY[0])
-//                || !$this->isIntegerAndMoreThanZero($xy[1], $maxXY[1])
-//            )
-//        ) {
-//            $errorMessage = $type . $index;
-//            $errorMessage .= ' x / y must be integers, more than 0 and';
-//            $errorMessage .= ' less than ' . $maxXY[0] . $separator . $maxXY[1] . ' !';
-//        }
-//
-//        if (!in_array(count($maxXY), [0, 2])) {
-//            echo 'case not implemented';
-//            exit();
-//        }
-//
-//        if ($errorMessage != '') {
-//            $this->errors[] = $errorMessage;
-//            return false;
-//        }
-//
-//        return true;
-//    }
-//
-//    private function addDisabledPositions($position)
-//    {
-//        if (!in_array($position, $this->disabledPositions)) {
-//            $this->errors[] = 'The current position is already locked by another option : ' . $position;
-//            return;
-//        }
-//        $this->errors[] = $position;
-//    }
-
-//    public function generateConfigurationFromArray($data)
-//    {
-//        if ($this->isValidXY('*', $data['map_dimension'], 'Map dimensions')) {
-//            $mapDimensions = explode('*', $data['map_dimension']);
-//            foreach ($mapDimensions as $index => $mapDimension) {
-//                $mapDimensions[$index]--;
-//            }
-//
-//            foreach ($data['treasures'] as $index => $treasure) {
-//                $this->isValidXY(',', $treasure, 'Treasure', $index, $mapDimensions);
-//            }
-//
-//            foreach ($data['mountains'] as $index => $mountain) {
-//                if ($this->isValidXY(',', $mountain, 'Mountain', $index, $mapDimensions)) {
-//                    $this->addDisabledPositions($mountain);
-//                }
-//            }
-//
-//            foreach ($data['adventurers'] as $adventurer) {
-//                $this->isValidXY(',', $adventurer['position'], $adventurer['name'], '', $mapDimensions);
-//            }
-//        }
-//
-//        var_dump($this->errors);
-//        exit();
-//    }
 }

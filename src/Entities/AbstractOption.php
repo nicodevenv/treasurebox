@@ -32,5 +32,15 @@ abstract class AbstractOption {
         $this->y = $data['y'];
     }
 
+    public function getX()
+    {
+        return $this->x;
+    }
+
+    public function getY()
+    {
+        return $this->y;
+    }
+
     public abstract function getType();
 }
