@@ -2,12 +2,14 @@
 
 namespace App\Service;
 
+use App\Entities\AdventurerOption;
+
 class CheckerService {
     public static $allowedDirections = [
-        'N',
-        'S',
-        'E',
-        'W',
+        AdventurerOption::NORTH_DIRECTION,
+        AdventurerOption::SOUTH_DIRECTION,
+        AdventurerOption::WEST_DIRECTION,
+        AdventurerOption::EAST_DIRECTION,
     ];
 
     public static $allowedActions = [
@@ -16,7 +18,7 @@ class CheckerService {
         'G',
     ];
 
-    public static function isIntegerAndMoreThanZero($allowZero, $varToTest, $max = null, $debug = false)
+    public static function isIntegerAndMoreThanZero($allowZero, $varToTest, $max = null)
     {
         $varToTest = intval($varToTest);
 
