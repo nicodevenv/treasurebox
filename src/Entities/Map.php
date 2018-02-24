@@ -130,7 +130,7 @@ class Map {
             );
         }
 
-        if ($isStackable && $this->isMountainHere($option->getX(), $option->getY())) {
+        if ($isStackable && $this->isObstacleHere($option->getX(), $option->getY())) {
             throw new \Exception(
                 sprintf(
                     'Unable to put option in frame [%s, %s] because there is a mountain here.',

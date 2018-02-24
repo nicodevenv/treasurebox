@@ -211,17 +211,25 @@ class GameService {
      */
     public function playGameConfiguration($displayOnMove = false)
     {
+        $maxLoop = 1;
+        $looping = 0;
+
         $longestCharCount = $this->map->getLongestCharCount(array_merge($this->allTreasures, $this->allAdventurers));
         $separator = "------------------------------------\n";
 
         echo $this->map->displayMap($longestCharCount);
         echo $separator;
 
-        foreach( $this->allAdventurers as $adventurer) {
-            /** @var Entities\AdventurerOption $adventurer */
-            $actions = $adventurer->getActions();
-            for ($i = 0; $i < strlen($actions); $i++) {
-                switch ($actions[$i]) {
+        while($looping < $maxLoop) {
+            foreach( $this->allAdventurers as $adventurer) {
+                /** @var Entities\AdventurerOption $adventurer */
+                $actions = $adventurer->getActions();
+
+                if (strlen($actions) > $maxLoop) {
+                    $maxLoop = strlen($actions);
+                }
+
+                switch ($actions[$looping]) {
                     case Entities\AdventurerOption::MOVE_ACTION:
                         if ($this->map->isAdventurerMovable($adventurer)) {
                             $this->map->moveAdventurer($adventurer);
@@ -239,6 +247,7 @@ class GameService {
                         break;
                 }
             }
+            $looping++;
         }
         echo $this->map->displayMap($longestCharCount);
     }
