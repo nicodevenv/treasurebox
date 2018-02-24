@@ -5,10 +5,11 @@ use App\Entities;
 
 class GameService {
     const CONFIGURATION_PATH = 'public/inputs/game_configuration.txt';
-    const OUTPUT_PATH = 'public/output/game_output.txt';
+    const OUTPUT_PATH = 'public/outputs/game_output.txt';
 
     private $allAdventurers = [];
     private $allTreasures = [];
+    private $allMountains = [];
 
     private $optionTypes = [
         Entities\MountainOption::REFERENCE,
@@ -177,6 +178,7 @@ class GameService {
                 break;
             case Entities\MountainOption::REFERENCE:
                 $option = new Entities\MountainOption($data, $this->map);
+                $this->allMountains[] = $option;
                 break;
             case Entities\TreasureOption::REFERENCE:
                 $option = new Entities\TreasureOption($data, $this->map);
@@ -229,26 +231,72 @@ class GameService {
                     $maxLoop = strlen($actions);
                 }
 
-                switch ($actions[$looping]) {
-                    case Entities\AdventurerOption::MOVE_ACTION:
-                        if ($this->map->isAdventurerMovable($adventurer)) {
-                            $this->map->moveAdventurer($adventurer);
-                            if ($displayOnMove) {
-                                echo $this->map->displayMap($longestCharCount);
-                                echo $separator;
+                if (isset($actions[$looping])) {
+                    switch ($actions[$looping]) {
+                        case Entities\AdventurerOption::MOVE_ACTION:
+                            if ($this->map->isAdventurerMovable($adventurer)) {
+                                $this->map->moveAdventurer($adventurer);
+                                if ($displayOnMove) {
+                                    echo $this->map->displayMap($longestCharCount);
+                                    echo $separator;
+                                }
                             }
-                        }
-                        break;
-                    case Entities\AdventurerOption::RIGHT_ACTION;
-                        $adventurer->turn(Entities\AdventurerOption::RIGHT_ACTION);
-                        break;
-                    case Entities\AdventurerOption::LEFT_ACTION:
-                        $adventurer->turn(Entities\AdventurerOption::LEFT_ACTION);
-                        break;
+                            break;
+                        case Entities\AdventurerOption::RIGHT_ACTION;
+                            $adventurer->turn(Entities\AdventurerOption::RIGHT_ACTION);
+                            break;
+                        case Entities\AdventurerOption::LEFT_ACTION:
+                            $adventurer->turn(Entities\AdventurerOption::LEFT_ACTION);
+                            break;
+                    }
                 }
             }
             $looping++;
         }
-        echo $this->map->displayMap($longestCharCount);
+    }
+
+    public function writeResults()
+    {
+        $file = fopen(self::OUTPUT_PATH, 'w');
+
+        $mapStr = sprintf('C - %s - %s', $this->map->getWidth(), $this->map->getHeight());
+        fwrite($file, $mapStr . "\n");
+
+        foreach ($this->allMountains as $mountain) {
+            /** @var Entities\MountainOption $mountain */
+            $mountainStr = sprintf('M - %s - %s', $mountain->getX(), $mountain->getY());
+            fwrite($file, $mountainStr . "\n");
+        }
+
+        foreach ($this->allTreasures as $treasure) {
+            /** @var Entities\TreasureOption $treasure */
+            if ($treasure->getCounter() > 0) {
+                $treasureStr = sprintf('T - %s - %s - %s', $treasure->getX(), $treasure->getY(), $treasure->getCounter());
+                fwrite($file, $treasureStr . "\n");
+            }
+        }
+
+        foreach ($this->allAdventurers as $adventurer) {
+            /** @var Entities\AdventurerOption $adventurer */
+            $treasureCollected = 0;
+
+            if (count($adventurer->getTreasures()) > 0) {
+                foreach ($adventurer->getTreasures() as $treasure) {
+                    $treasureCollected += $treasure->getCounter();
+                }
+            }
+
+            $adventurerStr = sprintf(
+                'A - %s - %s - %s - %s - %s',
+                $adventurer->getName(),
+                $adventurer->getX(),
+                $adventurer->getY(),
+                $adventurer->getDirection(),
+                $treasureCollected
+            );
+            fwrite($file, $adventurerStr . "\n");
+        }
+
+        fclose($file);
     }
 }

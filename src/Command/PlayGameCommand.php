@@ -39,6 +39,7 @@ class PlayGameCommand extends Command
         try {
             $this->gameService->prepareGameConfiguration();
             $this->gameService->playGameConfiguration(true);
+            $this->gameService->writeResults();
         } catch(\Exception $e) {
             $this->output->writeln($e->getMessage());
         }
