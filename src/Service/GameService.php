@@ -251,7 +251,6 @@ class GameService {
             }
             $looping++;
         }
-        echo $this->map->displayMap($longestCharCount);
     }
 
     public function writeResults()
