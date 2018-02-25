@@ -19,8 +19,20 @@ class GameService {
         Entities\AdventurerOption::REFERENCE
     ];
 
+    /** @var MapService */
+    private $mapService;
+
+    /** @var AdventurerService  */
+    private $adventurerService;
+
     /** @var Entities\Map */
     private $map;
+
+    public function __construct(MapService $mapService, AdventurerService $adventurerService)
+    {
+        $this->mapService = $mapService;
+        $this->adventurerService = $adventurerService;
+    }
 
     public function getConfigurationPath()
     {
@@ -221,7 +233,7 @@ class GameService {
         }
 
         if ($option !== null) {
-            $this->map->addOption($option);
+            $this->mapService->addOption($this->map, $option);
         }
     }
 
@@ -240,9 +252,9 @@ class GameService {
         $maxLoop = 1;
         $looping = 0;
 
-        $longestCharCount = $this->map->getLongestCharCount(array_merge($this->allTreasures, $this->allAdventurers));
+        $longestCharCount = $this->mapService->getLongestCharCount(array_merge($this->allTreasures, $this->allAdventurers));
 
-        $gameSteps .= $this->map->displayMap($longestCharCount);
+        $gameSteps .= $this->mapService->displayMap($this->map, $longestCharCount);
         $gameSteps .= self::STEP_SEPARATOR;
 
         while($looping < $maxLoop) {
@@ -257,10 +269,10 @@ class GameService {
                 if (isset($actions[$looping])) {
                     switch ($actions[$looping]) {
                         case Entities\AdventurerOption::MOVE_ACTION:
-                            if ($this->map->isAdventurerMovable($adventurer)) {
-                                $this->map->moveAdventurer($adventurer);
+                            if ($this->mapService->isAdventurerMovable($this->map, $adventurer)) {
+                                $this->mapService->moveAdventurer($this->map, $adventurer);
                                 if ($displayOnMove) {
-                                    $gameSteps .= $this->map->displayMap($longestCharCount);
+                                    $gameSteps .= $this->mapService->displayMap($this->map, $longestCharCount);
                                     if ($looping < $maxLoop) {
                                         $gameSteps .= self::STEP_SEPARATOR;
                                     }
@@ -268,10 +280,10 @@ class GameService {
                             }
                             break;
                         case Entities\AdventurerOption::RIGHT_ACTION;
-                            $adventurer->turn(Entities\AdventurerOption::RIGHT_ACTION);
+                            $this->adventurerService->turn($adventurer, Entities\AdventurerOption::RIGHT_ACTION);
                             break;
                         case Entities\AdventurerOption::LEFT_ACTION:
-                            $adventurer->turn(Entities\AdventurerOption::LEFT_ACTION);
+                            $this->adventurerService->turn($adventurer, Entities\AdventurerOption::LEFT_ACTION);
                             break;
                     }
                 }
@@ -280,7 +292,7 @@ class GameService {
         }
 
         if (!$displayOnMove) {
-            $gameSteps .= $this->map->displayMap($longestCharCount);
+            $gameSteps .= $this->mapService->displayMap($this->map, $longestCharCount);
         }
 
         return $gameSteps;

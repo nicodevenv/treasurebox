@@ -64,35 +64,6 @@ class AdventurerOption extends AbstractOption {
         parent::__construct($data, $map);
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function addTreasure()
-    {
-        $foundTreasure = null;
-        foreach ($this->treasures as $treasure) {
-            /** @var TreasureOption $treasure */
-            if ($treasure->getX() === $this->getX() && $treasure->getY() === $this->getY()) {
-                $foundTreasure = $treasure;
-            }
-        }
-
-        if ($foundTreasure === null) {
-            $treasureData = [
-                'x' => $this->getX(),
-                'y' => $this->getY(),
-                'counter' => 1,
-            ];
-
-            $foundTreasure =new TreasureOption($treasureData);
-            $this->treasures[] = $foundTreasure;
-            return;
-        }
-
-        /** @var TreasureOption $foundTreasure */
-        $foundTreasure->incrementCounter();
-    }
-
     public function getActions()
     {
         return $this->actions;
@@ -118,65 +89,13 @@ class AdventurerOption extends AbstractOption {
         return 'Adventurer';
     }
 
-    public function getNextPosition()
+    public function addTreasure(TreasureOption $treasure)
     {
-        $x = $this->getX();
-        $y = $this->getY();
-
-        switch($this->direction) {
-            case self::NORTH_DIRECTION:
-                $y -= 1;
-                break;
-            case self::SOUTH_DIRECTION:
-                $y += 1;
-                break;
-            case self::EAST_DIRECTION:
-                $x += 1;
-                break;
-            case self::WEST_DIRECTION:
-                $x -= 1;
-                break;
-        }
-
-        return [
-            'x' => $x,
-            'y' => $y,
-        ];
+        $this->treasures[] = $treasure;
     }
 
-    public function move()
+    public function setDirection($direction)
     {
-        $nextPosition = $this->getNextPosition();
-        $this->setX($nextPosition['x']);
-        $this->setY($nextPosition['y']);
-    }
-
-    public function turn($turnTo)
-    {
-        $this->direction = $this->getNextDirection($turnTo);
-    }
-
-    public function getNextDirection($turnTo, $selectFirst = false) {
-        $sortedDirections = self::SORTED_DIRECTIONS;
-        if ($turnTo === 'G') {
-            $sortedDirections = array_reverse($sortedDirections);
-        }
-
-        $selectNext = false;
-        if ($selectFirst) {
-            $selectNext = true;
-        }
-
-        foreach ($sortedDirections as $direction) {
-            if ($selectNext) {
-                return $direction;
-            }
-
-            if ($direction === $this->direction) {
-                $selectNext = true;
-            }
-        }
-
-        return $this->getNextDirection($turnTo, true);
+        $this->direction = $direction;
     }
 }
