@@ -30,3 +30,18 @@ services:
         class: App\Service\GameService
         autowire: true
         public: true
+        arguments:
+            $mapService: '@map.service'
+            $adventurerService: '@adventurer.service'
+
+    map.service:
+        class: App\Service\MapService
+        autowire: true
+        public: true
+        arguments:
+            $adventurerService: '@adventurer.service'
+
+    adventurer.service:
+        class: App\Service\AdventurerService
+        autowire: true
+        public: true
