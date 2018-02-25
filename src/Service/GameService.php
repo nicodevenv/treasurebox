@@ -4,8 +4,10 @@ namespace App\Service;
 use App\Entities;
 
 class GameService {
-    const CONFIGURATION_PATH = 'public/inputs/game_configuration.txt';
-    const OUTPUT_PATH = 'public/outputs/game_output.txt';
+    const STEP_SEPARATOR = "------------------------------------\n";
+
+    private $configurationPath = 'public/inputs/game_configuration.txt';
+    private $outputPath = 'public/outputs/game_output.txt';
 
     private $allAdventurers = [];
     private $allTreasures = [];
@@ -20,9 +22,29 @@ class GameService {
     /** @var Entities\Map */
     private $map;
 
+    public function getConfigurationPath()
+    {
+        return $this->configurationPath;
+    }
+
+    public function setConfigurationPath($path)
+    {
+        $this->configurationPath = $path;
+    }
+
+    public function getOutputPath()
+    {
+        return $this->outputPath;
+    }
+
+    public function setOutputPath($path)
+    {
+        $this->outputPath = $path;
+    }
+
     public function generateConfigurationFromArray($data)
     {
-        $file = fopen(self::CONFIGURATION_PATH, 'w');
+        $file = fopen($this->configurationPath, 'w');
 
         foreach ($data as $row) {
             fwrite($file, $row . "\n");
@@ -69,7 +91,7 @@ class GameService {
      */
     private function sortGameConfigurationData()
     {
-        $file = $this->getFile(self::CONFIGURATION_PATH);
+        $file = $this->getFile($this->configurationPath);
 
         $mapDimension = [];
         $mountains = [];
@@ -174,7 +196,7 @@ class GameService {
 
         switch($type) {
             case Entities\Map::REFERENCE:
-                $this->map = new Entities\Map($data['width'], $data['height'], self::OUTPUT_PATH);
+                $this->map = new Entities\Map($data['width'], $data['height'], $this->outputPath);
                 break;
             case Entities\MountainOption::REFERENCE:
                 $option = new Entities\MountainOption($data, $this->map);
@@ -211,16 +233,17 @@ class GameService {
     /**
      * @throws \Exception
      */
-    public function playGameConfiguration($displayOnMove = false)
+    public function getGameSteps($displayOnMove = false)
     {
+        $gameSteps = '';
+
         $maxLoop = 1;
         $looping = 0;
 
         $longestCharCount = $this->map->getLongestCharCount(array_merge($this->allTreasures, $this->allAdventurers));
-        $separator = "------------------------------------\n";
 
-        echo $this->map->displayMap($longestCharCount);
-        echo $separator;
+        $gameSteps .= $this->map->displayMap($longestCharCount);
+        $gameSteps .= self::STEP_SEPARATOR;
 
         while($looping < $maxLoop) {
             foreach( $this->allAdventurers as $adventurer) {
@@ -237,8 +260,10 @@ class GameService {
                             if ($this->map->isAdventurerMovable($adventurer)) {
                                 $this->map->moveAdventurer($adventurer);
                                 if ($displayOnMove) {
-                                    echo $this->map->displayMap($longestCharCount);
-                                    echo $separator;
+                                    $gameSteps .= $this->map->displayMap($longestCharCount);
+                                    if ($looping < $maxLoop) {
+                                        $gameSteps .= self::STEP_SEPARATOR;
+                                    }
                                 }
                             }
                             break;
@@ -253,11 +278,17 @@ class GameService {
             }
             $looping++;
         }
+
+        if (!$displayOnMove) {
+            $gameSteps .= $this->map->displayMap($longestCharCount);
+        }
+
+        return $gameSteps;
     }
 
     public function writeResults()
     {
-        $file = fopen(self::OUTPUT_PATH, 'w');
+        $file = fopen($this->outputPath, 'w');
 
         $mapStr = sprintf('C - %s - %s', $this->map->getWidth(), $this->map->getHeight());
         fwrite($file, $mapStr . "\n");

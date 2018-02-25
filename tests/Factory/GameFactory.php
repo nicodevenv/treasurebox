@@ -14,10 +14,19 @@ class GameFactory {
         'A - Lara - 1 - 1 - S - AADADAGGA',
     ];
 
+    private $gameService;
+
     public function __construct()
     {
-        $gameService = new GameService();
+        $this->gameService = new GameService();
+        $this->gameService->setConfigurationPath('tests/Files/game_configuration_test.txt');
+        $this->gameService->setOutputPath('tests/Files/game_output_test.txt');
 
-        $gameService->generateConfigurationFromArray($this->data);
+        $this->gameService->generateConfigurationFromArray($this->data);
+    }
+
+    public function getGameService()
+    {
+        return $this->gameService;
     }
 }
