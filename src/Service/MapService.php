@@ -80,7 +80,7 @@ class MapService
                     $this->adventurerService->addTreasure($adventurer, $option);
                     $option->decrementCounter();
                     if ($option->getCounter() === 0) {
-                        unset($this->mapFrames[$adventurer->getY()][$adventurer->getX()][$optionIndex]);
+                        $map->removeOption($adventurer->getX(), $adventurer->getY(), $optionIndex);
                     }
                 }
             }
