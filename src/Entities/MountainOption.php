@@ -6,7 +6,10 @@ class MountainOption extends AbstractOption
 {
     const REFERENCE = 'M';
 
-    public function getType()
+    /**
+     * @return string
+     */
+    public function getType(): string
     {
         return 'Mountain';
     }

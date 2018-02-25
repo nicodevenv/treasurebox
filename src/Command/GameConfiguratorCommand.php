@@ -10,6 +10,7 @@ use App\Service\GameService;
 
 class GameConfiguratorCommand extends Command
 {
+    /** @var GameService */
     private $gameService;
 
     private $gameConfiguration = [];
@@ -49,7 +50,7 @@ class GameConfiguratorCommand extends Command
      *
      * @return mixed
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): mixed
     {
         $this->helperQuestion = $this->getHelper('question');
         $this->input          = $input;
@@ -67,14 +68,24 @@ class GameConfiguratorCommand extends Command
         return;
     }
 
-    private function requireAnswer($message)
+    /**
+     * @param string $message
+     *
+     * @return string
+     */
+    private function requireAnswer($message): string
     {
         $question = new Question($message . ' : ');
 
         return $this->helperQuestion->ask($this->input, $this->output, $question);
     }
 
-    private function requireOptionAnswers($type)
+    /**
+     * @param string $type
+     *
+     * @return string
+     */
+    private function requireOptionAnswers($type): string
     {
         $separator           = ' - ';
         $adventurerName      = '';
@@ -123,6 +134,9 @@ class GameConfiguratorCommand extends Command
         return implode($separator, [$type, $positionOrDimension]);
     }
 
+    /**
+     * @param null|string $forcedOption
+     */
     private function askOption($forcedOption = null)
     {
         $chosenOption = $forcedOption;

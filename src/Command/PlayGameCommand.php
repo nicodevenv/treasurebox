@@ -10,8 +10,14 @@ use App\Service\GameService;
 
 class PlayGameCommand extends Command
 {
+    /** @var GameService  */
     private $gameService;
 
+    /**
+     * PlayGameCommand constructor.
+     *
+     * @param GameService $gameService
+     */
     public function __construct(GameService $gameService)
     {
         $this->gameService = $gameService;
@@ -33,7 +39,13 @@ class PlayGameCommand extends Command
             ->setDescription('Use configuration data to play game.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return mixed
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): mixed
     {
         $this->input = $input;
         $this->output = $output;
@@ -51,5 +63,7 @@ class PlayGameCommand extends Command
         } catch(\Exception $e) {
             $this->output->writeln($e->getMessage());
         }
+
+        return;
     }
 }

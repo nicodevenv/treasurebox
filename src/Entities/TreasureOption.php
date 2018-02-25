@@ -22,22 +22,38 @@ class TreasureOption extends AbstractOption
         parent::__construct($data, $map);
     }
 
+    /**
+     * @return $this
+     */
     public function incrementCounter()
     {
         $this->counter++;
+
+        return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function decrementCounter()
     {
         $this->counter--;
+
+        return $this;
     }
 
-    public function getCounter()
+    /**
+     * @return int
+     */
+    public function getCounter(): int
     {
         return $this->counter;
     }
 
-    public function getType()
+    /**
+     * @return string
+     */
+    public function getType(): string
     {
         return 'Treasure';
     }
