@@ -8,7 +8,8 @@ use App\Entities\Map;
 use App\Entities\MountainOption;
 use App\Entities\TreasureOption;
 
-class MapService {
+class MapService
+{
     private $adventurerService;
 
     public function __construct(AdventurerService $adventurerService)
@@ -30,7 +31,8 @@ class MapService {
         return true;
     }
 
-    public function isObstacleHere(Map $map, $x, $y) {
+    public function isObstacleHere(Map $map, $x, $y)
+    {
         foreach ($map->getMapFrames()[$y][$x] as $option) {
             if ($option instanceof MountainOption || $option instanceof AdventurerOption) {
                 return true;
@@ -52,6 +54,7 @@ class MapService {
 
     /**
      * @param AdventurerOption $adventurer
+     *
      * @throws \Exception
      */
     public function moveAdventurer(Map $map, AdventurerOption $adventurer)
@@ -65,6 +68,7 @@ class MapService {
 
     /**
      * @param AdventurerOption $adventurer
+     *
      * @throws \Exception
      */
     private function collectSomething(Map $map, AdventurerOption $adventurer)
@@ -85,7 +89,7 @@ class MapService {
 
     public function getLongestCharCount($options)
     {
-        $charCount = 0;
+        $charCount         = 0;
         $reservedCharCount = 4;
 
         foreach ($options as $option) {
@@ -111,7 +115,7 @@ class MapService {
     {
         $outputStr = '';
         foreach ($map->getMapFrames() as $y => $row) {
-            foreach($row as $x => $data) {
+            foreach ($row as $x => $data) {
                 $currentStr = '.';
                 if (count($data) > 0) {
                     foreach ($data as $option) {
@@ -152,7 +156,7 @@ class MapService {
 
     /**
      * @param AbstractOption $option
-     * @param bool $isStackable
+     * @param bool           $isStackable
      *
      * @throws \Exception
      */

@@ -12,13 +12,6 @@ class GameConfiguratorCommand extends Command
 {
     private $gameService;
 
-    public function __construct(GameService $gameService)
-    {
-        $this->gameService = $gameService;
-
-        parent::__construct();
-    }
-
     private $gameConfiguration = [];
 
     /** @var InputInterface */
@@ -31,15 +24,63 @@ class GameConfiguratorCommand extends Command
 
     private $finished = false;
 
+    /**
+     * GameConfiguratorCommand constructor.
+     *
+     * @param GameService $gameService
+     */
+    public function __construct(GameService $gameService)
+    {
+        $this->gameService = $gameService;
+
+        parent::__construct();
+    }
+
+    protected function configure()
+    {
+        $this
+            ->setName('treasurebox:configurator')
+            ->setDescription('Provide data to create automatically a game configuration');
+    }
+
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     *
+     * @return mixed
+     */
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this->helperQuestion = $this->getHelper('question');
+        $this->input          = $input;
+        $this->output         = $output;
+
+        $this->askOption('C');
+
+        while (!$this->finished) {
+            $this->askOption();
+        }
+
+        $this->gameService->generateConfigurationFromArray($this->gameConfiguration);
+        $this->output->writeln(sprintf('Game configuration has been generated in : %s', $this->gameService->getConfigurationPath()));
+
+        return;
+    }
+
     private function requireAnswer($message)
     {
         $question = new Question($message . ' : ');
+
         return $this->helperQuestion->ask($this->input, $this->output, $question);
     }
 
     private function requireOptionAnswers($type)
     {
-        $separator = ' - ';
+        $separator           = ' - ';
+        $adventurerName      = '';
+        $adventurerDirection = '';
+        $adventurerActions   = '';
+        $treasureCounter     = 0;
 
         //ask for data
         if ($type === 'A') {
@@ -61,7 +102,7 @@ class GameConfiguratorCommand extends Command
 
         if ($type === 'A') {
             $adventurerDirection = $this->requireAnswer('Direction');
-            $adventurerActions = $this->requireAnswer('Actions');
+            $adventurerActions   = $this->requireAnswer('Actions');
         }
 
         //returning data
@@ -92,6 +133,7 @@ class GameConfiguratorCommand extends Command
 
         if ($chosenOption === 'F') {
             $this->finished = true;
+
             return;
         }
 
@@ -114,27 +156,5 @@ class GameConfiguratorCommand extends Command
         if ($noChoiceFound) {
             $this->output->writeln('Sorry we didn\'t find any option matching your choice');
         }
-    }
-
-    protected function configure()
-    {
-        $this
-            ->setName('treasurebox:configurator')
-            ->setDescription('Provide data to create automatically a game configuration');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $this->helperQuestion = $this->getHelper('question');
-        $this->input = $input;
-        $this->output = $output;
-
-        $this->askOption('C');
-
-        while (!$this->finished) {
-            $this->askOption();
-        }
-
-        $this->gameService->generateConfigurationFromArray($this->gameConfiguration);
     }
 }

@@ -26,7 +26,7 @@ class GameServiceTest extends AbstractTestCase
             'A - Lara - 1 - 1 - S - AADADAGGA',
         ];
 
-        $gameFactory= new Factory\GameFactory($data);
+        $gameFactory   = new Factory\GameFactory($data);
         $this->subject = $gameFactory->getGameService();
 
         parent::setUp();
@@ -54,7 +54,7 @@ class GameServiceTest extends AbstractTestCase
         ];
         $this->subject->generateConfigurationFromArray($dataArray);
 
-        $this->assertEquals('resource' ,gettype($this->invokeMethod($this->subject, 'getFile', [$this->subject->getConfigurationPath()])));
+        $this->assertEquals('resource', gettype($this->invokeMethod($this->subject, 'getFile', [$this->subject->getConfigurationPath()])));
     }
 
     public function testCheckExactDataNumber()
@@ -69,7 +69,7 @@ class GameServiceTest extends AbstractTestCase
 
         $attempted = [
             'C' => [
-                'width' =>'3',
+                'width'  => '3',
                 'height' => '4',
             ],
             'M' => [
@@ -84,23 +84,23 @@ class GameServiceTest extends AbstractTestCase
             ],
             'T' => [
                 [
-                    'x' => '0',
-                    'y' => '3',
+                    'x'       => '0',
+                    'y'       => '3',
                     'counter' => '2',
                 ],
                 [
-                    'x' => '1',
-                    'y' => '3',
+                    'x'       => '1',
+                    'y'       => '3',
                     'counter' => '3',
                 ]
             ],
             'A' => [
                 [
-                    'name' => 'Lara',
-                    'x' => '1',
-                    'y' => '1',
+                    'name'      => 'Lara',
+                    'x'         => '1',
+                    'y'         => '1',
                     'direction' => 'S',
-                    'actions' => 'AADADAGGA',
+                    'actions'   => 'AADADAGGA',
                 ]
             ]
         ];
@@ -137,13 +137,18 @@ class GameServiceTest extends AbstractTestCase
             ['C', ['width' => '5', 'height' => '5'], Map::class],
             ['M', ['x' => '1', 'y' => '1'], MountainOption::class, ['width' => '5', 'height' => '5']],
             ['T', ['x' => '1', 'y' => '1', 'counter' => '2'], TreasureOption::class, ['width' => '5', 'height' => '5']],
-            ['A', [
-                'name' => 'Lara',
-                'x' => '1',
-                'y' => '1',
-                'direction' => 'N',
-                'actions' => 'AADA',
-            ], AdventurerOption::class, ['width' => '5', 'height' => '5']],
+            [
+                'A',
+                [
+                    'name'      => 'Lara',
+                    'x'         => '1',
+                    'y'         => '1',
+                    'direction' => 'N',
+                    'actions'   => 'AADA',
+                ],
+                AdventurerOption::class,
+                ['width' => '5', 'height' => '5']
+            ],
         ];
     }
 
@@ -157,6 +162,7 @@ class GameServiceTest extends AbstractTestCase
             $map = $this->subject->getMap();
             $this->assertEquals($map->getWidth(), $data ['width']);
             $this->assertEquals($map->getHeight(), $data ['height']);
+
             return;
         }
 
@@ -171,12 +177,12 @@ class GameServiceTest extends AbstractTestCase
     {
         $this->subject->prepareGameConfiguration();
         $getGameSteps = $this->subject->getGameSteps(false);
-        $nbSteps  = count(explode(GameService::STEP_SEPARATOR, $getGameSteps));
+        $nbSteps      = count(explode(GameService::STEP_SEPARATOR, $getGameSteps));
         $this->assertEquals(2, $nbSteps);
 
         $this->subject->prepareGameConfiguration();
         $getGameSteps = $this->subject->getGameSteps(true);
-        $nbSteps  = count(explode(GameService::STEP_SEPARATOR, $getGameSteps));
+        $nbSteps      = count(explode(GameService::STEP_SEPARATOR, $getGameSteps));
         $this->assertEquals(6, $nbSteps);
     }
 
@@ -198,7 +204,7 @@ class GameServiceTest extends AbstractTestCase
 
         $loop = 0;
         while (($row = fgets($file)) !== false) {
-            $this->assertEquals($attemptedResults[$loop], str_replace("\n", '',$row));
+            $this->assertEquals($attemptedResults[$loop], str_replace("\n", '', $row));
             $loop++;
         }
     }

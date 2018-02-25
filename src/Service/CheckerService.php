@@ -4,7 +4,8 @@ namespace App\Service;
 
 use App\Entities\AdventurerOption;
 
-class CheckerService {
+class CheckerService
+{
     public static $allowedDirections = [
         AdventurerOption::NORTH_DIRECTION,
         AdventurerOption::SOUTH_DIRECTION,
@@ -48,7 +49,7 @@ class CheckerService {
 
     public static function isValidAdventurerActionSet(string $actionSet)
     {
-        for ($i=0; $i < strlen($actionSet); $i++) {
+        for ($i = 0; $i < strlen($actionSet); $i++) {
             $action = $actionSet[$i];
 
             if (!in_array($action, self::$allowedActions)) {

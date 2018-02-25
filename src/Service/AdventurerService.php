@@ -4,7 +4,8 @@ namespace App\Service;
 use App\Entities\AdventurerOption;
 use App\Entities\TreasureOption;
 
-class AdventurerService {
+class AdventurerService
+{
     /**
      * @throws \Exception
      */
@@ -20,13 +21,14 @@ class AdventurerService {
 
         if ($foundTreasure === null) {
             $treasureData = [
-                'x' => $adventurer->getX(),
-                'y' => $adventurer->getY(),
+                'x'       => $adventurer->getX(),
+                'y'       => $adventurer->getY(),
                 'counter' => 1,
             ];
 
-            $foundTreasure =new TreasureOption($treasureData);
+            $foundTreasure = new TreasureOption($treasureData);
             $adventurer->addTreasure($foundTreasure);
+
             return;
         }
 
@@ -39,7 +41,7 @@ class AdventurerService {
         $x = $adventurer->getX();
         $y = $adventurer->getY();
 
-        switch($adventurer->getDirection()) {
+        switch ($adventurer->getDirection()) {
             case AdventurerOption::NORTH_DIRECTION:
                 $y -= 1;
                 break;
@@ -72,7 +74,8 @@ class AdventurerService {
         $adventurer->setDirection($this->getNextDirection($adventurer, $turnTo));
     }
 
-    public function getNextDirection(AdventurerOption$adventurer, $turnTo, $selectFirst = false) {
+    public function getNextDirection(AdventurerOption $adventurer, $turnTo, $selectFirst = false)
+    {
         $sortedDirections = AdventurerOption::SORTED_DIRECTIONS;
         if ($turnTo === 'G') {
             $sortedDirections = array_reverse($sortedDirections);

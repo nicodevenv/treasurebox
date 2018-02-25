@@ -1,10 +1,11 @@
 <?php
 
-namespace  App\Entities;
+namespace App\Entities;
 
 use App\Service\CheckerService;
 
-class AdventurerOption extends AbstractOption {
+class AdventurerOption extends AbstractOption
+{
     const REFERENCE = 'A';
 
     const NORTH_DIRECTION = 'N';
@@ -26,13 +27,15 @@ class AdventurerOption extends AbstractOption {
 
     /**
      * AdventurerOption constructor.
-     * @param $data
+     *
+     * @param     $data
      * @param Map $map
+     *
      * @throws \Exception
      */
     public function __construct($data, Map $map)
     {
-        $name = $data['name'];
+        $name      = $data['name'];
         $direction = $data['direction'];
         $actionSet = $data['actions'];
 
@@ -58,8 +61,8 @@ class AdventurerOption extends AbstractOption {
         }
 
         $this->direction = $direction;
-        $this->actions = $actionSet;
-        $this->name = $name;
+        $this->actions   = $actionSet;
+        $this->name      = $name;
 
         parent::__construct($data, $map);
     }
@@ -84,7 +87,7 @@ class AdventurerOption extends AbstractOption {
         return $this->treasures;
     }
 
-    public  function getType()
+    public function getType()
     {
         return 'Adventurer';
     }

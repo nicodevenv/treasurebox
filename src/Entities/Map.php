@@ -4,7 +4,8 @@ namespace App\Entities;
 
 use App\Service\CheckerService;
 
-class Map {
+class Map
+{
     const REFERENCE = 'C';
 
     private $mapWidth;
@@ -17,9 +18,11 @@ class Map {
 
     /**
      * Map constructor.
+     *
      * @param $width
      * @param $height
      * @param $outputFile
+     *
      * @throws \Exception
      */
     public function __construct($width, $height, $outputFile)
@@ -34,7 +37,7 @@ class Map {
             throw new \Exception('Map height invalid ! Attempted for integer > 0');
         }
 
-        $this->mapWidth = $width;
+        $this->mapWidth  = $width;
         $this->mapHeight = $height;
 
         for ($y = 0; $y < $height; $y++) {
@@ -51,7 +54,7 @@ class Map {
 
     public function getMaxX()
     {
-        return $this->mapWidth-1;
+        return $this->mapWidth - 1;
     }
 
     public function getHeight()
@@ -61,7 +64,7 @@ class Map {
 
     public function getMaxY()
     {
-        return $this->mapHeight-1;
+        return $this->mapHeight - 1;
     }
 
     public function getMapFrames()

@@ -3,7 +3,8 @@ namespace App\Service;
 
 use App\Entities;
 
-class GameService {
+class GameService
+{
     const STEP_SEPARATOR = "------------------------------------\n";
 
     private $configurationPath = 'public/inputs/game_configuration.txt';
@@ -22,7 +23,7 @@ class GameService {
     /** @var MapService */
     private $mapService;
 
-    /** @var AdventurerService  */
+    /** @var AdventurerService */
     private $adventurerService;
 
     /** @var Entities\Map */
@@ -30,7 +31,7 @@ class GameService {
 
     public function __construct(MapService $mapService, AdventurerService $adventurerService)
     {
-        $this->mapService = $mapService;
+        $this->mapService        = $mapService;
         $this->adventurerService = $adventurerService;
     }
 
@@ -86,6 +87,7 @@ class GameService {
     /**
      * @param $dataArray
      * @param $count
+     *
      * @return string
      * @throws \Exception
      */
@@ -101,35 +103,61 @@ class GameService {
     /**
      * @throws \Exception
      */
+    public function prepareGameConfiguration()
+    {
+        $sortedData = $this->sortGameConfigurationData();
+
+        foreach ($sortedData as $type => $data) {
+            //For Mountains, Treasures, Adventurers, there is a sub array to loop
+            if (in_array($type, $this->optionTypes)) {
+                foreach ($data as $row) {
+                    $this->createEntities($type, $row);
+                }
+                continue;
+            }
+
+            //For Map data only, we can get the values directly
+            $this->createEntities($type, $data);
+        }
+    }
+
+    /**
+     * @throws \Exception
+     */
     private function sortGameConfigurationData()
     {
         $file = $this->getFile($this->configurationPath);
 
         $mapDimension = [];
-        $mountains = [];
-        $treasures = [];
-        $adventurers = [];
+        $mountains    = [];
+        $treasures    = [];
+        $adventurers  = [];
 
         $separator = ' - ';
         while (($row = fgets($file)) !== false) {
             $row = trim($row);
             if (strlen($row) > 0) {
                 $contentArray = explode($separator, $row);
+
+                //The first char of each row represent it's type [C, M, T, A]
                 $type = $contentArray[0];
 
-                switch($type) {
+                switch ($type) {
                     case Entities\Map::REFERENCE:
+                        //Check that the map dimensions are already defined
                         if (!empty($mapDimension)) {
                             throw new \Exception('Map dimensions are defined multiple times');
                         }
 
+                        //Ensure that the row contains 3 columns of data [Type - X - Y]
                         $this->checkExactDataNumber($contentArray, 3);
                         $mapDimension = [
-                            'width' => $contentArray[1],
+                            'width'  => $contentArray[1],
                             'height' => $contentArray[2],
                         ];
                         break;
                     case Entities\MountainOption::REFERENCE:
+                        //Ensure that the row contains 3 columns of data [Type - X - Y]
                         $this->checkExactDataNumber($contentArray, 3);
 
                         $mountains[] = [
@@ -138,29 +166,32 @@ class GameService {
                         ];
                         break;
                     case Entities\TreasureOption::REFERENCE:
+                        //Ensure that the row contains 4 columns of data [Type - X - Y - COUNTER]
                         $this->checkExactDataNumber($contentArray, 4);
 
                         $treasures[] = [
-                            'x' => $contentArray[1],
-                            'y' => $contentArray[2],
+                            'x'       => $contentArray[1],
+                            'y'       => $contentArray[2],
                             'counter' => $contentArray[3],
                         ];
                         break;
                     case Entities\AdventurerOption::REFERENCE:
+                        //Ensure that the row contains 6 columns of data [Type - NAME - X - Y - DIRECTION - ACTIONS]
                         $this->checkExactDataNumber($contentArray, 6);
+
                         $adventurers[] = [
-                            'name' => $contentArray[1],
-                            'x' => $contentArray[2],
-                            'y'=> $contentArray[3],
+                            'name'      => $contentArray[1],
+                            'x'         => $contentArray[2],
+                            'y'         => $contentArray[3],
                             'direction' => $contentArray[4],
-                            'actions' => $contentArray[5],
+                            'actions'   => $contentArray[5],
                         ];
                         break;
                     default:
                         throw new \Exception(
                             sprintf(
                                 'Type format not allowed. "%s" given. ' .
-                                'Warning ! We\'ve detected some problem with copy paste data.. We\'ll fix it ASAP',
+                                'Warning ! We\'ve detected some problems with copy paste data.. We\'ll fix it ASAP',
                                 $type
                             )
                         );
@@ -170,30 +201,11 @@ class GameService {
         }
 
         return [
-            Entities\Map::REFERENCE => $mapDimension,
-            Entities\MountainOption::REFERENCE => $mountains,
-            Entities\TreasureOption::REFERENCE => $treasures,
+            Entities\Map::REFERENCE              => $mapDimension,
+            Entities\MountainOption::REFERENCE   => $mountains,
+            Entities\TreasureOption::REFERENCE   => $treasures,
             Entities\AdventurerOption::REFERENCE => $adventurers,
         ];
-    }
-
-    /**
-     * @throws \Exception
-     */
-    public function prepareGameConfiguration()
-    {
-        $sortedData = $this->sortGameConfigurationData();
-
-        foreach ($sortedData as $type => $data) {
-            if (in_array($type, $this->optionTypes)) {
-                foreach ($data as $row) {
-                    $this->createEntities($type, $row);
-                }
-                continue;
-            }
-
-            $this->createEntities($type, $data);
-        }
     }
 
     /**
@@ -206,20 +218,20 @@ class GameService {
     {
         $option = null;
 
-        switch($type) {
+        switch ($type) {
             case Entities\Map::REFERENCE:
                 $this->map = new Entities\Map($data['width'], $data['height'], $this->outputPath);
                 break;
             case Entities\MountainOption::REFERENCE:
-                $option = new Entities\MountainOption($data, $this->map);
+                $option               = new Entities\MountainOption($data, $this->map);
                 $this->allMountains[] = $option;
                 break;
             case Entities\TreasureOption::REFERENCE:
-                $option = new Entities\TreasureOption($data, $this->map);
+                $option               = new Entities\TreasureOption($data, $this->map);
                 $this->allTreasures[] = $option;
                 break;
             case Entities\AdventurerOption::REFERENCE:
-                $option = new Entities\AdventurerOption($data, $this->map);
+                $option                 = new Entities\AdventurerOption($data, $this->map);
                 $this->allAdventurers[] = $option;
                 break;
             default:
@@ -249,19 +261,23 @@ class GameService {
     {
         $gameSteps = '';
 
-        $maxLoop = 1;
-        $looping = 0;
+        $maxLoop = 1; // Save the max actions of aventurer
+        $looping = 0; // Used to get the [index] action of adventurer
 
+        // Get the longest char number to write in result (add blank space for difference)
         $longestCharCount = $this->mapService->getLongestCharCount(array_merge($this->allTreasures, $this->allAdventurers));
 
+        // Start result
         $gameSteps .= $this->mapService->displayMap($this->map, $longestCharCount);
         $gameSteps .= self::STEP_SEPARATOR;
 
-        while($looping < $maxLoop) {
-            foreach( $this->allAdventurers as $adventurer) {
+        // Looping on each adventurer / each action 1 by 1
+        while ($looping < $maxLoop) {
+            foreach ($this->allAdventurers as $adventurer) {
                 /** @var Entities\AdventurerOption $adventurer */
                 $actions = $adventurer->getActions();
 
+                // Save if found another longest char count to continue [while] instruction
                 if (strlen($actions) > $maxLoop) {
                     $maxLoop = strlen($actions);
                 }
@@ -271,8 +287,10 @@ class GameService {
                         case Entities\AdventurerOption::MOVE_ACTION:
                             if ($this->mapService->isAdventurerMovable($this->map, $adventurer)) {
                                 $this->mapService->moveAdventurer($this->map, $adventurer);
+                                // Display each step if chosen in play command
                                 if ($displayOnMove) {
                                     $gameSteps .= $this->mapService->displayMap($this->map, $longestCharCount);
+                                    // Do not add separator if the current step is last
                                     if ($looping < $maxLoop) {
                                         $gameSteps .= self::STEP_SEPARATOR;
                                     }
@@ -291,6 +309,7 @@ class GameService {
             $looping++;
         }
 
+        // Display last step if each step displayer is deactivated (prevent duplication of data)
         if (!$displayOnMove) {
             $gameSteps .= $this->mapService->displayMap($this->map, $longestCharCount);
         }

@@ -4,7 +4,8 @@ namespace App\Tests\Factory;
 
 use App\Service\GameService;
 
-class GameFactory {
+class GameFactory
+{
     private $data = [];
 
     private $gameService;

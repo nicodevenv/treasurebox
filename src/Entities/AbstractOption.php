@@ -4,15 +4,18 @@ namespace App\Entities;
 
 use App\Service\CheckerService;
 
-abstract class AbstractOption {
+abstract class AbstractOption
+{
     private $x;
 
     private $y;
 
     /**
      * AbstractOption constructor.
-     * @param $data
+     *
+     * @param     $data
      * @param Map $map
+     *
      * @throws \Exception
      */
     public function __construct($data, Map $map = null)
