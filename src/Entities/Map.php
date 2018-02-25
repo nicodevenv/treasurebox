@@ -83,29 +83,25 @@ class Map
     }
 
     /**
-     * @param int            $x
-     * @param int            $y
      * @param AbstractOption $option
      *
      * @return $this
      */
-    public function addOption(int $x, int $y, AbstractOption $option)
+    public function addOption(AbstractOption $option)
     {
-        $this->mapFrames[$y][$x][] = $option;
+        $this->mapFrames[$option->getY()][$option->getX()][] = $option;
 
         return $this;
     }
 
     /**
-     * @param int $x
-     * @param int $y
      * @param int $index
      *
      * @return $this
      */
-    public function removeOption(int $x, int $y, int $index)
+    public function removeOption(AbstractOption $option, int $index)
     {
-        unset($this->mapFrames[$y][$x][$index]);
+        unset($this->mapFrames[$option->getY()][$option->getX()][$index]);
 
         return $this;
     }

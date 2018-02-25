@@ -46,7 +46,7 @@ class MapService
     {
         foreach ($map->getMapFrames()[$option->getY()][$option->getX()] as $index => $loopOption) {
             if ($option === $loopOption) {
-                $map->removeOption($option->getX(), $option->getY(), $index);
+                $map->removeOption($option, $index);
             }
         }
 
@@ -80,7 +80,7 @@ class MapService
                     $this->adventurerService->addTreasure($adventurer, $option);
                     $option->decrementCounter();
                     if ($option->getCounter() === 0) {
-                        $map->removeOption($adventurer->getX(), $adventurer->getY(), $optionIndex);
+                        $map->removeOption($adventurer, $optionIndex);
                     }
                 }
             }
@@ -183,6 +183,6 @@ class MapService
             );
         }
 
-        $map->addOption($option->getX(), $option->getY(), $option);
+        $map->addOption($option);
     }
 }
