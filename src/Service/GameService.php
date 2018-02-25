@@ -36,11 +36,11 @@ class GameService {
      */
     private function getFile($filePath)
     {
-        if (!file_exists(self::CONFIGURATION_PATH)) {
+        if (!file_exists($filePath)) {
             throw new \Exception('The current file does not exist : ' . $filePath);
         }
 
-        $file = fopen(self::CONFIGURATION_PATH, 'r');
+        $file = fopen($filePath, 'r');
 
         if (!$file) {
             throw new \Exception('Unable to open file : ' . $filePath);
