@@ -10,7 +10,8 @@ use App\Service\AdventurerService;
 use App\Service\MapService;
 use App\Tests\AbstractTestCase;
 
-class MapServiceTest extends AbstractTestCase {
+class MapServiceTest extends AbstractTestCase
+{
     /** @var  MapService */
     private $subject;
 
@@ -28,12 +29,12 @@ class MapServiceTest extends AbstractTestCase {
 
         $this->map = new Map(5, 5);
 
-        $adventurerData = [
-            'x' => 1,
-            'y' => 1,
+        $adventurerData   = [
+            'x'         => 1,
+            'y'         => 1,
             'direction' => 'N',
-            'actions' => 'A',
-            'name' => 'Nicolas',
+            'actions'   => 'A',
+            'name'      => 'Nicolas',
         ];
         $this->adventurer = new AdventurerOption($adventurerData, $this->map);
 
@@ -48,11 +49,11 @@ class MapServiceTest extends AbstractTestCase {
 
         // Treasure on North
         $treasureData = [
-            'x' => 1,
-            'y' => 0,
+            'x'       => 1,
+            'y'       => 0,
             'counter' => 1
         ];
-        $treasure = new TreasureOption($treasureData, $this->map);
+        $treasure     = new TreasureOption($treasureData, $this->map);
         $this->map->addOption($treasure);
         $this->map->removeOption($treasure, 0);
         $this->assertTrue($this->subject->isAdventurerMovable($this->map, $this->adventurer));
@@ -62,7 +63,7 @@ class MapServiceTest extends AbstractTestCase {
             'x' => 1,
             'y' => 0,
         ];
-        $mountain = new MountainOption($mountainData);
+        $mountain     = new MountainOption($mountainData);
         $this->map->addOption($mountain);
         $this->assertFalse($this->subject->isAdventurerMovable($this->map, $this->adventurer));
         $this->map->removeOption($mountain, 0);
@@ -93,11 +94,11 @@ class MapServiceTest extends AbstractTestCase {
 
         // Treasure on North
         $treasureData = [
-            'x' => 1,
-            'y' => 1,
+            'x'       => 1,
+            'y'       => 1,
             'counter' => 1
         ];
-        $treasure = new TreasureOption($treasureData, $this->map);
+        $treasure     = new TreasureOption($treasureData, $this->map);
         $this->map->addOption($treasure);
         $this->map->removeOption($treasure, 0);
         $this->assertFalse($this->subject->isObstacleHere($this->map, 1, 1));
@@ -107,7 +108,7 @@ class MapServiceTest extends AbstractTestCase {
             'x' => 1,
             'y' => 1,
         ];
-        $mountain = new MountainOption($mountainData);
+        $mountain     = new MountainOption($mountainData);
         $this->map->addOption($mountain);
         $this->assertTrue($this->subject->isObstacleHere($this->map, 1, 1));
         $this->map->removeOption($mountain, 0);
@@ -117,11 +118,11 @@ class MapServiceTest extends AbstractTestCase {
     {
         // Treasure on North
         $treasureData = [
-            'x' => 1,
-            'y' => 1,
+            'x'       => 1,
+            'y'       => 1,
             'counter' => 1
         ];
-        $treasure = new TreasureOption($treasureData, $this->map);
+        $treasure     = new TreasureOption($treasureData, $this->map);
         $this->map->addOption($treasure);
 
         if (count($this->map->getMapFrames()[1][1]) > 0) {
@@ -130,7 +131,10 @@ class MapServiceTest extends AbstractTestCase {
         }
     }
 
-    public function moveAdventurerProvider()
+    /**
+     * @return array
+     */
+    public function moveAdventurerProvider(): array
     {
         return [
             ['N', 1, 0],
@@ -141,12 +145,16 @@ class MapServiceTest extends AbstractTestCase {
     }
 
     /**
+     * @param string $direction
+     * @param int    $attemptedX
+     * @param int    $attemptedY
+     *
      * @dataProvider moveAdventurerProvider
      */
-    public function testMoveAdventurer($direction, $attemptedX, $attemptedY)
+    public function testMoveAdventurer(string $direction, int $attemptedX, int $attemptedY)
     {
         $this->adventurer->setDirection($direction);
-        $this->subject->moveAdventurer($this->map,$this->adventurer);
+        $this->subject->moveAdventurer($this->map, $this->adventurer);
 
         $this->assertEquals($attemptedX, $this->adventurer->getX());
         $this->assertEquals($attemptedY, $this->adventurer->getY());
@@ -156,11 +164,11 @@ class MapServiceTest extends AbstractTestCase {
     {
         // Treasure on North
         $treasureData = [
-            'x' => 1,
-            'y' => 1,
+            'x'       => 1,
+            'y'       => 1,
             'counter' => 1
         ];
-        $treasure = new TreasureOption($treasureData, $this->map);
+        $treasure     = new TreasureOption($treasureData, $this->map);
         $this->map->addOption($treasure);
 
         $this->invokeMethod($this->subject, 'collectSomething', [$this->map, $this->adventurer]);
@@ -179,7 +187,7 @@ class MapServiceTest extends AbstractTestCase {
     {
         $this->map->addOption($this->adventurer);
 
-        $str = $this->subject->displayMap($this->map, $this->subject->getLongestCharCount([$this->adventurer]));
+        $str       = $this->subject->displayMap($this->map, $this->subject->getLongestCharCount([$this->adventurer]));
         $attempted = ".           .           .           .           .           \n";
         $attempted .= ".           A(Nicolas)  .           .           .           \n";
         $attempted .= ".           .           .           .           .           \n";
@@ -193,11 +201,11 @@ class MapServiceTest extends AbstractTestCase {
     {
         // Treasure on North
         $treasureData = [
-            'x' => 1,
-            'y' => 1,
+            'x'       => 1,
+            'y'       => 1,
             'counter' => 1
         ];
-        $treasure = new TreasureOption($treasureData, $this->map);
+        $treasure     = new TreasureOption($treasureData, $this->map);
         $this->subject->addOption($this->map, $treasure, false);
 
         $this->expectException(\Exception::class);

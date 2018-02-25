@@ -23,9 +23,9 @@ class TreasureOption extends AbstractOption
     }
 
     /**
-     * @return $this
+     * @return TreasureOption
      */
-    public function incrementCounter()
+    public function incrementCounter(): TreasureOption
     {
         $this->counter++;
 
@@ -33,9 +33,9 @@ class TreasureOption extends AbstractOption
     }
 
     /**
-     * @return $this
+     * @return TreasureOption
      */
-    public function decrementCounter()
+    public function decrementCounter(): TreasureOption
     {
         $this->counter--;
 

@@ -29,33 +29,54 @@ class GameService
     /** @var Entities\Map */
     private $map;
 
+    /**
+     * GameService constructor.
+     *
+     * @param MapService        $mapService
+     * @param AdventurerService $adventurerService
+     */
     public function __construct(MapService $mapService, AdventurerService $adventurerService)
     {
         $this->mapService        = $mapService;
         $this->adventurerService = $adventurerService;
     }
 
-    public function getConfigurationPath()
+    /**
+     * @return string
+     */
+    public function getConfigurationPath(): string
     {
         return $this->configurationPath;
     }
 
-    public function setConfigurationPath($path)
+    /**
+     * @param string $path
+     */
+    public function setConfigurationPath(string $path)
     {
         $this->configurationPath = $path;
     }
 
-    public function getOutputPath()
+    /**
+     * @return string
+     */
+    public function getOutputPath(): string
     {
         return $this->outputPath;
     }
 
-    public function setOutputPath($path)
+    /**
+     * @param string $path
+     */
+    public function setOutputPath(string $path)
     {
         $this->outputPath = $path;
     }
 
-    public function generateConfigurationFromArray($data)
+    /**
+     * @param array $data
+     */
+    public function generateConfigurationFromArray(array $data)
     {
         $file = fopen($this->configurationPath, 'w');
 
@@ -67,9 +88,12 @@ class GameService
     }
 
     /**
+     * @param string $filePath
+     *
+     * @return resource
      * @throws \Exception
      */
-    private function getFile($filePath)
+    private function getFile(string $filePath)
     {
         if (!file_exists($filePath)) {
             throw new \Exception('The current file does not exist : ' . $filePath);
@@ -91,7 +115,7 @@ class GameService
      * @return string
      * @throws \Exception
      */
-    private function checkExactDataNumber($dataArray, $count)
+    private function checkExactDataNumber($dataArray, $count): string
     {
         if (count($dataArray) > $count) {
             throw new \Exception('The current data are not valid : ' . implode(' - ', $dataArray));
@@ -122,9 +146,10 @@ class GameService
     }
 
     /**
+     * @return array
      * @throws \Exception
      */
-    private function sortGameConfigurationData()
+    private function sortGameConfigurationData(): array
     {
         $file = $this->getFile($this->configurationPath);
 
@@ -214,7 +239,7 @@ class GameService
      *
      * @throws \Exception
      */
-    private function createEntities($type, $data)
+    private function createEntities(string $type, array $data)
     {
         $option = null;
 
@@ -249,15 +274,20 @@ class GameService
         }
     }
 
-    public function getMap()
+    /**
+     * @return Entities\Map
+     */
+    public function getMap(): Entities\Map
     {
         return $this->map;
     }
 
     /**
-     * @throws \Exception
+     * @param bool $displayOnMove
+     *
+     * @return string
      */
-    public function getGameSteps($displayOnMove = false)
+    public function getGameSteps(bool $displayOnMove = false): string
     {
         $gameSteps = '';
 

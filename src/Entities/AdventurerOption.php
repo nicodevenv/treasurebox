@@ -102,9 +102,9 @@ class AdventurerOption extends AbstractOption
     /**
      * @param TreasureOption $treasure
      *
-     * @return $this
+     * @return AdventurerOption
      */
-    public function addTreasure(TreasureOption $treasure)
+    public function addTreasure(TreasureOption $treasure): AdventurerOption
     {
         $this->treasures[] = $treasure;
 
@@ -114,9 +114,9 @@ class AdventurerOption extends AbstractOption
     /**
      * @param $direction
      *
-     * @return $this
+     * @return AdventurerOption
      */
-    public function setDirection($direction)
+    public function setDirection($direction): AdventurerOption
     {
         $this->direction = $direction;
 

@@ -85,9 +85,9 @@ class Map
     /**
      * @param AbstractOption $option
      *
-     * @return $this
+     * @return Map
      */
-    public function addOption(AbstractOption $option)
+    public function addOption(AbstractOption $option): Map
     {
         $this->mapFrames[$option->getY()][$option->getX()][] = $option;
 
@@ -95,11 +95,12 @@ class Map
     }
 
     /**
-     * @param int $index
+     * @param AbstractOption $option
+     * @param int            $index
      *
-     * @return $this
+     * @return Map
      */
-    public function removeOption(AbstractOption $option, int $index)
+    public function removeOption(AbstractOption $option, int $index): Map
     {
         unset($this->mapFrames[$option->getY()][$option->getX()][$index]);
 

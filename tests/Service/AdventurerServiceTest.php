@@ -133,7 +133,10 @@ class AdventurerServiceTest extends AbstractTestCase
         $this->assertEquals($y, $this->adventurer->getY());
     }
 
-    public function getNextDirectionProvider()
+    /**
+     * @return array
+     */
+    public function getNextDirectionProvider(): array
     {
         return [
             // Turn right
@@ -160,12 +163,14 @@ class AdventurerServiceTest extends AbstractTestCase
     }
 
     /**
-     * @param $direction
-     * @param $attemptedDirection
-     * @param $selectFirst
+     * @param string $direction
+     * @param string $attemptedDirection
+     * @param string $turnTo
+     * @param bool   $selectFirst
+     *
      * @dataProvider getNextDirectionProvider
      */
-    public function testGetNextDirection($direction, $attemptedDirection, $turnTo, $selectFirst)
+    public function testGetNextDirection(string $direction, string $attemptedDirection, string $turnTo, bool $selectFirst)
     {
         $this->adventurer->setDirection($direction);
         $this->assertEquals($attemptedDirection, $this->subject->getNextDirection($this->adventurer, $turnTo, $selectFirst));
