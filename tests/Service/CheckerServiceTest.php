@@ -27,7 +27,10 @@ class ExpectedErrorTest extends AbstractTestCase
         $this->assertTrue(CheckerService::isIntegerAndMoreThanZero(true, 3, 5, true));
     }
 
-    public function adventurerDirectionProvider()
+    /**
+     * @return array
+     */
+    public function adventurerDirectionProvider(): array
     {
         return [
             ['N'],
@@ -38,9 +41,11 @@ class ExpectedErrorTest extends AbstractTestCase
     }
 
     /**
+     * @param string $direction
+     *
      * @dataProvider adventurerDirectionProvider
      */
-    public function testIsValidAdventurerDirectionTrue($direction)
+    public function testIsValidAdventurerDirectionTrue(string $direction)
     {
         $this->assertTrue(CheckerService::isValidAdventurerDirection($direction));
     }

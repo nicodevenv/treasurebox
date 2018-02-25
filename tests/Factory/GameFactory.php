@@ -12,6 +12,13 @@ class GameFactory
 
     private $gameService;
 
+    /**
+     * GameFactory constructor.
+     *
+     * @param                   $data
+     * @param MapService        $mapService
+     * @param AdventurerService $adventurerService
+     */
     public function __construct($data, MapService $mapService, AdventurerService $adventurerService)
     {
         $this->data = $data;
@@ -23,7 +30,10 @@ class GameFactory
         $this->gameService->generateConfigurationFromArray($this->data);
     }
 
-    public function getGameService()
+    /**
+     * @return GameService
+     */
+    public function getGameService(): GameService
     {
         return $this->gameService;
     }

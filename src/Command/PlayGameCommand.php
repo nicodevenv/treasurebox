@@ -10,7 +10,7 @@ use App\Service\GameService;
 
 class PlayGameCommand extends Command
 {
-    /** @var GameService  */
+    /** @var GameService */
     private $gameService;
 
     /**
@@ -47,7 +47,7 @@ class PlayGameCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): mixed
     {
-        $this->input = $input;
+        $this->input  = $input;
         $this->output = $output;
 
         $stepDisplay = false;
@@ -60,7 +60,7 @@ class PlayGameCommand extends Command
             $this->gameService->prepareGameConfiguration();
             $this->output->writeln($this->gameService->getGameSteps($stepDisplay));
             $this->gameService->writeResults();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->output->writeln($e->getMessage());
         }
 

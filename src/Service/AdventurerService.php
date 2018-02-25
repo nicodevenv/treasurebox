@@ -7,6 +7,9 @@ use App\Entities\TreasureOption;
 class AdventurerService
 {
     /**
+     * @param AdventurerOption $adventurer
+     * @param TreasureOption   $treasureToAdd
+     *
      * @throws \Exception
      */
     public function addTreasure(AdventurerOption $adventurer, TreasureOption $treasureToAdd)
@@ -40,7 +43,12 @@ class AdventurerService
         $foundTreasure->incrementCounter();
     }
 
-    public function getNextPosition(AdventurerOption $adventurer)
+    /**
+     * @param AdventurerOption $adventurer
+     *
+     * @return array
+     */
+    public function getNextPosition(AdventurerOption $adventurer): array
     {
         $x = $adventurer->getX();
         $y = $adventurer->getY();
@@ -66,6 +74,9 @@ class AdventurerService
         ];
     }
 
+    /**
+     * @param AdventurerOption $adventurer
+     */
     public function move(AdventurerOption $adventurer)
     {
         $nextPosition = $this->getNextPosition($adventurer);
@@ -73,7 +84,14 @@ class AdventurerService
         $adventurer->setY($nextPosition['y']);
     }
 
-    public function getNextDirection(AdventurerOption $adventurer, $turnTo, $selectFirst = false)
+    /**
+     * @param AdventurerOption $adventurer
+     * @param string           $turnTo
+     * @param bool             $selectFirst
+     *
+     * @return string
+     */
+    public function getNextDirection(AdventurerOption $adventurer, string $turnTo, bool $selectFirst = false): string
     {
         $sortedDirections = AdventurerOption::SORTED_DIRECTIONS;
         if ($turnTo === 'G') {
@@ -98,7 +116,11 @@ class AdventurerService
         return $this->getNextDirection($adventurer, $turnTo, true);
     }
 
-    public function turn(AdventurerOption $adventurer, $turnTo)
+    /**
+     * @param AdventurerOption $adventurer
+     * @param string           $turnTo
+     */
+    public function turn(AdventurerOption $adventurer, string $turnTo)
     {
         $adventurer->setDirection($this->getNextDirection($adventurer, $turnTo));
     }

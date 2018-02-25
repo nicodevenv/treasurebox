@@ -17,7 +17,13 @@ class MapService
         $this->adventurerService = $adventurerService;
     }
 
-    public function isAdventurerMovable(Map $map, AdventurerOption $adventurer)
+    /**
+     * @param Map              $map
+     * @param AdventurerOption $adventurer
+     *
+     * @return bool
+     */
+    public function isAdventurerMovable(Map $map, AdventurerOption $adventurer): bool
     {
         $nextPosition = $this->adventurerService->getNextPosition($adventurer);
         if (
@@ -31,7 +37,14 @@ class MapService
         return true;
     }
 
-    public function isObstacleHere(Map $map, $x, $y)
+    /**
+     * @param Map $map
+     * @param int $x
+     * @param int $y
+     *
+     * @return bool
+     */
+    public function isObstacleHere(Map $map, int $x, int $y): bool
     {
         foreach ($map->getMapFrames()[$y][$x] as $option) {
             if ($option instanceof MountainOption || $option instanceof AdventurerOption) {
@@ -42,6 +55,10 @@ class MapService
         return false;
     }
 
+    /**
+     * @param Map            $map
+     * @param AbstractOption $option
+     */
     public function removeOption(Map $map, AbstractOption $option)
     {
         foreach ($map->getMapFrames()[$option->getY()][$option->getX()] as $index => $loopOption) {
@@ -53,9 +70,8 @@ class MapService
     }
 
     /**
+     * @param Map              $map
      * @param AdventurerOption $adventurer
-     *
-     * @throws \Exception
      */
     public function moveAdventurer(Map $map, AdventurerOption $adventurer)
     {
@@ -67,9 +83,8 @@ class MapService
     }
 
     /**
+     * @param Map              $map
      * @param AdventurerOption $adventurer
-     *
-     * @throws \Exception
      */
     private function collectSomething(Map $map, AdventurerOption $adventurer)
     {
@@ -87,7 +102,12 @@ class MapService
         }
     }
 
-    public function getLongestCharCount($options)
+    /**
+     * @param array $options
+     *
+     * @return string
+     */
+    public function getLongestCharCount(array $options): string
     {
         $charCount         = 0;
         $reservedCharCount = 4;
@@ -111,7 +131,13 @@ class MapService
         return $charCount;
     }
 
-    public function displayMap(Map $map, $longestCharCount)
+    /**
+     * @param Map $map
+     * @param int $longestCharCount
+     *
+     * @return string
+     */
+    public function displayMap(Map $map, int $longestCharCount): string
     {
         $outputStr = '';
         foreach ($map->getMapFrames() as $y => $row) {
@@ -155,12 +181,13 @@ class MapService
     }
 
     /**
+     * @param Map            $map
      * @param AbstractOption $option
      * @param bool           $isStackable
      *
      * @throws \Exception
      */
-    public function addOption(Map $map, $option, $isStackable = false)
+    public function addOption(Map $map, AbstractOption $option, bool $isStackable = false)
     {
         if (!$isStackable && count($map->getMapFrames()[$option->getY()][$option->getX()]) > 0) {
             throw new \Exception(

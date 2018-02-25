@@ -29,7 +29,7 @@ class GameServiceTest extends AbstractTestCase
         ];
 
         $adventurerService = new AdventurerService();
-        $mapService = new MapService($adventurerService);
+        $mapService        = new MapService($adventurerService);
 
         $gameFactory   = new Factory\GameFactory($data, $mapService, $adventurerService);
         $this->subject = $gameFactory->getGameService();
@@ -113,7 +113,10 @@ class GameServiceTest extends AbstractTestCase
         $this->assertEquals($attempted, $result);
     }
 
-    public function prepareGameConfigurationProvider()
+    /**
+     * @return array
+     */
+    public function prepareGameConfigurationProvider(): array
     {
         return [
             [1, 0, 0, MountainOption::class],
@@ -125,10 +128,14 @@ class GameServiceTest extends AbstractTestCase
     }
 
     /**
+     * @param int    $x
+     * @param int    $y
+     * @param int    $index
+     * @param string $attemptedClass
+     *
      * @dataProvider prepareGameConfigurationProvider
-     * @throws \Exception
      */
-    public function testPrepareGameConfiguration($x, $y, $index, $attemptedClass)
+    public function testPrepareGameConfiguration(int $x, int $y, int $index, string $attemptedClass)
     {
         $this->subject->prepareGameConfiguration();
         $mapFrames = $this->subject->getMap()->getMapFrames();
@@ -136,7 +143,10 @@ class GameServiceTest extends AbstractTestCase
         $this->assertInstanceOf($attemptedClass, $mapFrames[$y][$x][$index]);
     }
 
-    public function createEntitiesProvider()
+    /**
+     * @return array
+     */
+    public function createEntitiesProvider(): array
     {
         return [
             ['C', ['width' => '5', 'height' => '5'], Map::class],
@@ -158,9 +168,14 @@ class GameServiceTest extends AbstractTestCase
     }
 
     /**
+     * @param string     $type
+     * @param array      $data
+     * @param string     $attemptedClass
+     * @param array|null $mapData
+     *
      * @dataProvider createEntitiesProvider
      */
-    public function testCreateEntities($type, $data, $attemptedClass, $mapData = null)
+    public function testCreateEntities(string $type, array $data, string $attemptedClass, array $mapData = null)
     {
         if ($attemptedClass === Map::class) {
             $this->invokeMethod($this->subject, 'createEntities', [$type, $data]);
