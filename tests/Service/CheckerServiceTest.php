@@ -32,7 +32,7 @@ class ExpectedErrorTest extends AbstractTestCase
             ['N'],
             ['S'],
             ['E'],
-            ['W'],
+            ['O'],
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use App\Service\GameService;
@@ -28,6 +29,7 @@ class PlayGameCommand extends Command
     {
         $this
             ->setName('treasurebox:play')
+            ->addArgument('stepDisplay', InputArgument::OPTIONAL, 'Display result on each step')
             ->setDescription('Use configuration data to play game.');
     }
 
@@ -36,9 +38,16 @@ class PlayGameCommand extends Command
         $this->input = $input;
         $this->output = $output;
 
+        $stepDisplay = false;
+        $displayType = $input->getArgument('stepDisplay');
+        if ($displayType && filter_var($displayType, FILTER_VALIDATE_BOOLEAN)) {
+            $stepDisplay = true;
+        }
+
         try {
             $this->gameService->prepareGameConfiguration();
-            $this->gameService->playGameConfiguration(true);
+            $gameSteps = $this->gameService->getGameSteps($stepDisplay);
+            $this->output->writeln($gameSteps);
             $this->gameService->writeResults();
         } catch(\Exception $e) {
             $this->output->writeln($e->getMessage());

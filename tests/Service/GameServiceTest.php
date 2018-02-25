@@ -17,15 +17,25 @@ class GameServiceTest extends AbstractTestCase
 
     public function setUp()
     {
-        $this->subject = new GameService();
+        $data = [
+            'C - 3 - 4',
+            'M - 1 - 0',
+            'M - 2 - 1',
+            'T - 0 - 3 - 2',
+            'T - 1 - 3 - 3',
+            'A - Lara - 1 - 1 - S - AADADAGGA',
+        ];
+
+        $gameFactory= new Factory\GameFactory($data);
+        $this->subject = $gameFactory->getGameService();
 
         parent::setUp();
     }
 
     public function testGenerateConfigurationFromArray()
     {
-        if (file_exists(GameService::CONFIGURATION_PATH)) {
-            unlink(GameService::CONFIGURATION_PATH);
+        if (file_exists($this->subject->getConfigurationPath())) {
+            unlink($this->subject->getConfigurationPath());
         }
 
         $dataArray = [
@@ -33,7 +43,7 @@ class GameServiceTest extends AbstractTestCase
             'This is another row test',
         ];
         $this->subject->generateConfigurationFromArray($dataArray);
-        $this->assertFileExists(GameService::CONFIGURATION_PATH);
+        $this->assertFileExists($this->subject->getConfigurationPath());
     }
 
     public function testGetFile()
@@ -44,7 +54,7 @@ class GameServiceTest extends AbstractTestCase
         ];
         $this->subject->generateConfigurationFromArray($dataArray);
 
-        $this->assertEquals('resource' ,gettype($this->invokeMethod($this->subject, 'getFile', [GameService::CONFIGURATION_PATH])));
+        $this->assertEquals('resource' ,gettype($this->invokeMethod($this->subject, 'getFile', [$this->subject->getConfigurationPath()])));
     }
 
     public function testCheckExactDataNumber()
@@ -55,8 +65,6 @@ class GameServiceTest extends AbstractTestCase
 
     public function testSortGameConfigurationData()
     {
-        new Factory\GameFactory();
-
         $result = $this->invokeMethod($this->subject, 'sortGameConfigurationData', []);
 
         $attempted = [
@@ -117,8 +125,6 @@ class GameServiceTest extends AbstractTestCase
      */
     public function testPrepareGameConfiguration($x, $y, $index, $attemptedClass)
     {
-        new Factory\GameFactory();
-
         $this->subject->prepareGameConfiguration();
         $mapFrames = $this->subject->getMap()->getMapFrames();
 
@@ -159,5 +165,41 @@ class GameServiceTest extends AbstractTestCase
         $this->invokeMethod($this->subject, 'createEntities', [$type, $data]);
         $mapFrames = $this->subject->getMap()->getMapFrames();
         $this->assertInstanceOf($attemptedClass, $mapFrames[$data['y']][$data['x']][0]);
+    }
+
+    public function testGetGameSteps()
+    {
+        $this->subject->prepareGameConfiguration();
+        $getGameSteps = $this->subject->getGameSteps(false);
+        $nbSteps  = count(explode(GameService::STEP_SEPARATOR, $getGameSteps));
+        $this->assertEquals(2, $nbSteps);
+
+        $this->subject->prepareGameConfiguration();
+        $getGameSteps = $this->subject->getGameSteps(true);
+        $nbSteps  = count(explode(GameService::STEP_SEPARATOR, $getGameSteps));
+        $this->assertEquals(6, $nbSteps);
+    }
+
+    public function testWriteResults()
+    {
+        $this->subject->prepareGameConfiguration();
+        $this->subject->getGameSteps();
+        $this->subject->writeResults();
+
+        $file = fopen($this->subject->getOutputPath(), 'r');
+
+        $attemptedResults = [
+            'C - 3 - 4',
+            'M - 1 - 0',
+            'M - 2 - 1',
+            'T - 1 - 3 - 2',
+            'A - Lara - 0 - 3 - S - 3'
+        ];
+
+        $loop = 0;
+        while (($row = fgets($file)) !== false) {
+            $this->assertEquals($attemptedResults[$loop], str_replace("\n", '',$row));
+            $loop++;
+        }
     }
 }
