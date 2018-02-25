@@ -67,38 +67,67 @@ class AdventurerOption extends AbstractOption
         parent::__construct($data, $map);
     }
 
-    public function getActions()
+    /**
+     * @return string
+     */
+    public function getActions(): string
     {
         return $this->actions;
     }
 
-    public function getDirection()
+    /**
+     * @return string
+     */
+    public function getDirection(): string
     {
         return $this->direction;
     }
 
-    public function getName()
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function getTreasures()
+    /**
+     * @return array
+     */
+    public function getTreasures(): array
     {
         return $this->treasures;
     }
 
-    public function getType()
-    {
-        return 'Adventurer';
-    }
-
+    /**
+     * @param TreasureOption $treasure
+     *
+     * @return $this
+     */
     public function addTreasure(TreasureOption $treasure)
     {
         $this->treasures[] = $treasure;
+
+        return $this;
     }
 
+    /**
+     * @param $direction
+     *
+     * @return $this
+     */
     public function setDirection($direction)
     {
         $this->direction = $direction;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType(): string
+    {
+        return 'Adventurer';
     }
 }

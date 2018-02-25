@@ -6,6 +6,8 @@ use App\Entities\AdventurerOption;
 use App\Entities\Map;
 use App\Entities\MountainOption;
 use App\Entities\TreasureOption;
+use App\Service\AdventurerService;
+use App\Service\MapService;
 use App\Tests\Factory;
 use App\Tests\AbstractTestCase;
 use App\Service\GameService;
@@ -26,7 +28,10 @@ class GameServiceTest extends AbstractTestCase
             'A - Lara - 1 - 1 - S - AADADAGGA',
         ];
 
-        $gameFactory   = new Factory\GameFactory($data);
+        $adventurerService = new AdventurerService();
+        $mapService = new MapService($adventurerService);
+
+        $gameFactory   = new Factory\GameFactory($data, $mapService, $adventurerService);
         $this->subject = $gameFactory->getGameService();
 
         parent::setUp();

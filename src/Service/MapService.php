@@ -77,7 +77,7 @@ class MapService
             foreach ($map->getMapFrames()[$adventurer->getY()][$adventurer->getX()] as $optionIndex => $option) {
                 if ($option instanceof TreasureOption) {
                     /** @var TreasureOption $option */
-                    $this->adventurerService->addTreasure($adventurer);
+                    $this->adventurerService->addTreasure($adventurer, $option);
                     $option->decrementCounter();
                     if ($option->getCounter() === 0) {
                         unset($this->mapFrames[$adventurer->getY()][$adventurer->getX()][$optionIndex]);

@@ -9,12 +9,16 @@ class AdventurerService
     /**
      * @throws \Exception
      */
-    public function addTreasure(AdventurerOption $adventurer)
+    public function addTreasure(AdventurerOption $adventurer, TreasureOption $treasureToAdd)
     {
+        if ($adventurer->getX() !== $treasureToAdd->getX() || $adventurer->getY() !== $treasureToAdd->getY()) {
+            throw new \Exception('Adventurer does not have the same position as Treasure\'s');
+        }
+
         $foundTreasure = null;
         foreach ($adventurer->getTreasures() as $treasure) {
             /** @var TreasureOption $treasure */
-            if ($treasure->getX() === $adventurer->getX() && $treasure->getY() === $adventurer->getY()) {
+            if ($treasure->getX() === $treasureToAdd->getX() && $treasure->getY() === $treasureToAdd->getY()) {
                 $foundTreasure = $treasure;
             }
         }
@@ -69,11 +73,6 @@ class AdventurerService
         $adventurer->setY($nextPosition['y']);
     }
 
-    public function turn(AdventurerOption $adventurer, $turnTo)
-    {
-        $adventurer->setDirection($this->getNextDirection($adventurer, $turnTo));
-    }
-
     public function getNextDirection(AdventurerOption $adventurer, $turnTo, $selectFirst = false)
     {
         $sortedDirections = AdventurerOption::SORTED_DIRECTIONS;
@@ -97,5 +96,10 @@ class AdventurerService
         }
 
         return $this->getNextDirection($adventurer, $turnTo, true);
+    }
+
+    public function turn(AdventurerOption $adventurer, $turnTo)
+    {
+        $adventurer->setDirection($this->getNextDirection($adventurer, $turnTo));
     }
 }

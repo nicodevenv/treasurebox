@@ -14,21 +14,16 @@ class Map
 
     private $mapFrames = [];
 
-    private $outputFile = null;
-
     /**
      * Map constructor.
      *
      * @param $width
      * @param $height
-     * @param $outputFile
      *
      * @throws \Exception
      */
-    public function __construct($width, $height, $outputFile)
+    public function __construct($width, $height)
     {
-        $this->outputFile = $outputFile;
-
         if (!CheckerService::isIntegerAndMoreThanZero(false, $width)) {
             throw new \Exception('Map width invalid ! Attempted for integer > 0');
         }
@@ -37,8 +32,8 @@ class Map
             throw new \Exception('Map height invalid ! Attempted for integer > 0');
         }
 
-        $this->mapWidth  = $width;
-        $this->mapHeight = $height;
+        $this->mapWidth  = intval($width);
+        $this->mapHeight = intval($height);
 
         for ($y = 0; $y < $height; $y++) {
             for ($x = 0; $x < $width; $x++) {
@@ -47,38 +42,71 @@ class Map
         }
     }
 
-    public function getWidth()
+    /**
+     * @return int
+     */
+    public function getWidth(): int
     {
         return $this->mapWidth;
     }
 
-    public function getMaxX()
+    /**
+     * @return int
+     */
+    public function getMaxX(): int
     {
         return $this->mapWidth - 1;
     }
 
-    public function getHeight()
+    /**
+     * @return int
+     */
+    public function getHeight(): int
     {
         return $this->mapHeight;
     }
 
-    public function getMaxY()
+    /**
+     * @return int
+     */
+    public function getMaxY(): int
     {
         return $this->mapHeight - 1;
     }
 
-    public function getMapFrames()
+    /**
+     * @return array
+     */
+    public function getMapFrames(): array
     {
         return $this->mapFrames;
     }
 
-    public function addOption($x, $y, AbstractOption $option)
+    /**
+     * @param int            $x
+     * @param int            $y
+     * @param AbstractOption $option
+     *
+     * @return $this
+     */
+    public function addOption(int $x, int $y, AbstractOption $option)
     {
         $this->mapFrames[$y][$x][] = $option;
+
+        return $this;
     }
 
-    public function removeOption($x, $y, $index)
+    /**
+     * @param int $x
+     * @param int $y
+     * @param int $index
+     *
+     * @return $this
+     */
+    public function removeOption(int $x, int $y, int $index)
     {
         unset($this->mapFrames[$y][$x][$index]);
+
+        return $this;
     }
 }
