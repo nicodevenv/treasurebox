@@ -17,7 +17,16 @@ class GameServiceTest extends AbstractTestCase
 
     public function setUp()
     {
-        $gameFactory= new Factory\GameFactory();
+        $data = [
+            'C - 3 - 4',
+            'M - 1 - 0',
+            'M - 2 - 1',
+            'T - 0 - 3 - 2',
+            'T - 1 - 3 - 3',
+            'A - Lara - 1 - 1 - S - AADADAGGA',
+        ];
+
+        $gameFactory= new Factory\GameFactory($data);
         $this->subject = $gameFactory->getGameService();
 
         parent::setUp();
@@ -56,8 +65,6 @@ class GameServiceTest extends AbstractTestCase
 
     public function testSortGameConfigurationData()
     {
-        new Factory\GameFactory();
-
         $result = $this->invokeMethod($this->subject, 'sortGameConfigurationData', []);
 
         $attempted = [
