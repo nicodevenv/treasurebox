@@ -5,6 +5,7 @@ namespace App\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use App\Service\GameService;
 
@@ -70,12 +71,23 @@ class GameConfiguratorCommand extends Command
 
     /**
      * @param string $message
+     * @param array  $choices
+     * @param string $choiceError
      *
      * @return string
      */
-    private function requireAnswer($message): string
+    private function requireAnswer($message, $choices = [], $choiceError = ""): string
     {
-        $question = new Question($message . ' : ');
+        if (count($choices) > 0) {
+            $question = new ChoiceQuestion(
+                $message,
+                $choices
+            );
+
+            $question->setErrorMessage($choiceError);
+        } else {
+            $question = new Question($message . ' : ');
+        }
 
         return $this->helperQuestion->ask($this->input, $this->output, $question);
     }
@@ -112,7 +124,7 @@ class GameConfiguratorCommand extends Command
         }
 
         if ($type === 'A') {
-            $adventurerDirection = $this->requireAnswer('Direction');
+            $adventurerDirection = $this->requireAnswer('Direction', ['N', 'S', 'E', 'O'], 'Please select between N, S, E, O');
             $adventurerActions   = $this->requireAnswer('Actions');
         }
 
