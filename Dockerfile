@@ -29,6 +29,6 @@ RUN php -r "readfile('https://getcomposer.org/installer');" | php \
 ADD . /var/www/html
 
 # Launch composer for autoloader and scripts
-RUN composer install --no-dev
+RUN composer install
 
 RUN composer dump-autoload -o -a
