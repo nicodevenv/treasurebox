@@ -45,7 +45,7 @@ class PlayGameCommand extends Command
      *
      * @return mixed
      */
-    protected function execute(InputInterface $input, OutputInterface $output): mixed
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->input  = $input;
         $this->output = $output;

@@ -50,7 +50,7 @@ class GameConfiguratorCommand extends Command
      *
      * @return mixed
      */
-    protected function execute(InputInterface $input, OutputInterface $output): mixed
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->helperQuestion = $this->getHelper('question');
         $this->input          = $input;
